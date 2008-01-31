@@ -55,14 +55,6 @@ class RecaptchaField extends DatalessField {
 	public $jsOptions = array();
 	
 	/**
-	 * Show error message either through recaptcha-widget
-	 * (default) or through a Silverstripe validator.
-	 *
-	 * @var boolean
-	 */
-	public $useInternalValidator = false;
-	
-	/**
 	 * Internal error-string returned by recaptcha,
 	 * e.g. "incorrect-captcha-sol". Used to generate the
 	 * new iframe-url after form-refresh.
@@ -193,7 +185,6 @@ HTML;
 	/**
 	 * Validate by submitting to external service
 	 *
-	 * @todo Add more detailed feedback if using {@link useInternalValidator}
 	 * @todo implement socket timeout handling (or switch to curl?)
 	 * @param Validator $validator
 	 * @return boolean
@@ -206,19 +197,17 @@ HTML;
 			|| !isset($_REQUEST['recaptcha_response_field']) 
 			|| empty($_REQUEST['recaptcha_response_field'])
 		) {
-			if($this->useInternalValidator) {
-				$validator->validationError(
-					$this->name, 
-					_t(
-						'RecaptchaField.EMPTY', 
-						"Please answer the captcha question",
-						PR_MEDIUM,
-						"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
-					), 
-					"validation", 
-					false
-				);
-			}
+			$validator->validationError(
+				$this->name, 
+				_t(
+					'RecaptchaField.EMPTY', 
+					"Please answer the captcha question",
+					PR_MEDIUM,
+					"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
+				), 
+				"validation", 
+				false
+			);
 			
 			return false;
 		}
@@ -242,12 +231,13 @@ HTML;
 			if(trim($error) != 'incorrect-captcha-sol') {
 				user_error("RecatpchaField::validate(): Recaptcha-service error: '{$error}", E_USER_ERROR);
 				return false;
-			} elseif($this->useInternalValidator) {
+			} else {
+				$this->errorString = trim($error);
 				$validator->validationError(
 					$this->name, 
 					_t(
 						'RecaptchaField.VALIDSOLUTION', 
-						"Your answer didn't match the question, please try again",
+						"Your answer didn't match the captcha words, please try again",
 						PR_MEDIUM,
 						"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
 					), 
@@ -255,10 +245,6 @@ HTML;
 					false
 				);
 				return false;
-			} else {
-				$this->errorString = trim($error);
-				$validator->validationError($this->name,'','validation');
-				return false;				
 			}
 		}
 		
