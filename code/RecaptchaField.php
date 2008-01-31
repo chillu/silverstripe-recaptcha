@@ -1,6 +1,6 @@
 <?php
 /**
- * Allows form to validate for non-bot submissions
+ * Provides an {@link FormField} which allows form to validate for non-bot submissions
  * by giving them a challenge to decrypt an image.
  * Generation and validation of captchas is handled on external server.
  * This field doesn't save anything back to the form,
