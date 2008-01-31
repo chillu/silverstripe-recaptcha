@@ -257,6 +257,7 @@ HTML;
 				return false;
 			} else {
 				$this->errorString = trim($error);
+				$validator->validationError($this->name,'','validation');
 				return false;				
 			}
 		}
