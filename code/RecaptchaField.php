@@ -120,7 +120,7 @@ class RecaptchaField extends DatalessField {
 	public static $recaptcha_js_url = "http://api.recaptcha.net/challenge?k=%s";
 	
 	
-	public function FieldHolder() {
+	public function Field() {
 		if(empty($this->publicApiKey) || empty($this->privateApiKey)) {
 			user_error('RecaptchaField::FieldHolder() Please specify valid Recaptcha Keys', E_USER_ERROR);
 		}
@@ -151,6 +151,22 @@ class RecaptchaField extends DatalessField {
 		return $html;
 	}
 	
+	function FieldHolder() {
+		$Title = $this->XML_val('Title');
+		$Message = $this->XML_val('Message');
+		$MessageType = $this->XML_val('MessageType');
+		$Type = $this->XML_val('Type');
+		$extraClass = $this->XML_val('extraClass');
+		$Name = $this->XML_val('Name');
+		$Field = $this->XML_val('Field');
+		
+		$messageBlock = (!empty($Message)) ? "<span class=\"message $MessageType\">$Message</span>" : "";
+
+		return <<<HTML
+<div id="$Name" class="field $Type $extraClass">{$Field}{$messageBlock}</div>
+HTML;
+	}
+	
 	/**
 	 * Transform options from PHP-array to javascript-object encapsulated
 	 * in a string.
@@ -175,7 +191,14 @@ class RecaptchaField extends DatalessField {
 		return $js;
 	}
 	
-	public function validate($data) {
+	/**
+	 * Validate by submitting to external service
+	 *
+	 * @todo Add more detailed feedback if using {@link useInternalValidator}
+	 * @param Validator $validator
+	 * @return boolean
+	 */
+	public function validate($validator) {
 		// don't bother querying the recaptcha-service if fields were empty
 		if(
 			!isset($_REQUEST['recaptcha_challenge_field']) 
