@@ -12,8 +12,7 @@
  * i18n::set_locale('de_DE');
  * </example>
  * 
- * CAUTION: Does NOT work when the form is submitted via ajax,
- * see http://recaptcha.net/apidocs/captcha/client.html for details on implementation.
+ * @todo Does NOT work when the form is submitted via ajax, see http://recaptcha.net/apidocs/captcha/client.html for details on implementation.
  * 
  * @see http://recaptcha.net
  * @see http://recaptcha.net/api/getkey
@@ -195,6 +194,7 @@ HTML;
 	 * Validate by submitting to external service
 	 *
 	 * @todo Add more detailed feedback if using {@link useInternalValidator}
+	 * @todo implement socket timeout handling (or switch to curl?)
 	 * @param Validator $validator
 	 * @return boolean
 	 */
@@ -219,6 +219,7 @@ HTML;
 					false
 				);
 			}
+			
 			return false;
 		}
 
@@ -238,7 +239,10 @@ HTML;
 		list($misc, $isValid, $error) = explode("\n", $response[1]);
 		
 		if($isValid != 'true') {
-			if($this->useInternalValidator) {
+			if(trim($error) != 'incorrect-captcha-sol') {
+				user_error("RecatpchaField::validate(): Recaptcha-service error: '{$error}", E_USER_ERROR);
+				return false;
+			} elseif($this->useInternalValidator) {
 				$validator->validationError(
 					$this->name, 
 					_t(
@@ -250,10 +254,11 @@ HTML;
 					"validation", 
 					false
 				);
+				return false;
 			} else {
 				$this->errorString = trim($error);
+				return false;				
 			}
-			return false;				
 		}
 		
 		return true;
