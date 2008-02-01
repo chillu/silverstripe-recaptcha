@@ -16,23 +16,9 @@
  * 
  * @see http://recaptcha.net
  * @see http://recaptcha.net/api/getkey
- * @version 0.1
+ * @version 0.2
  */
 class RecaptchaField extends DatalessField {
-	
-	/**
-	 * Your public API key for a specific domain (get one at http://recaptcha.net/api/getkey)
-	 *
-	 * @var string
-	 */
-	public $publicApiKey = '';
-	
-	/**
-	 * Your private API key for a specific domain (get one at http://recaptcha.net/api/getkey)
-	 *
-	 * @var string
-	 */
-	public $privateApiKey = '';
 	
 	/**
 	 * Use secure connection for API-calls
@@ -55,32 +41,19 @@ class RecaptchaField extends DatalessField {
 	public $jsOptions = array();
 	
 	/**
-	 * Internal error-string returned by recaptcha,
-	 * e.g. "incorrect-captcha-sol". Used to generate the
-	 * new iframe-url after form-refresh.
+	 * Your public API key for a specific domain (get one at http://recaptcha.net/api/getkey)
 	 *
-	 * @see http://recaptcha.net/apidocs/captcha/
-	 * @var unknown_type
+	 * @var string
 	 */
-	protected $errorString = '';
+	public static $public_api_key = '';
 	
 	/**
-	 * All languages in which the recaptcha widget is available.
+	 * Your private API key for a specific domain (get one at http://recaptcha.net/api/getkey)
 	 *
-	 * @see http://recaptcha.net/apidocs/captcha/client.html
-	 * @var array
+	 * @var string
 	 */
-	protected static $valid_languages = array(
-		'en',
-		'nl',
-		'fr',
-		'de',
-		'pt',
-		'ru',
-		'es',
-		'tr',
-	);
-
+	public static $private_api_key = '';
+	
 	/**
 	 * Standard API server addess
 	 *
@@ -100,7 +73,7 @@ class RecaptchaField extends DatalessField {
 	 *
 	 * @var string
 	 */
-	public static $api_verify_server = "api-verify.recaptcha.net";
+	public static $api_verify_server = 'api-verify.recaptcha.net';
 	
 	/**
 	 * Javascript-address which includes necessary logic from the recaptcha-server.
@@ -110,9 +83,26 @@ class RecaptchaField extends DatalessField {
 	 */
 	public static $recaptcha_js_url = "http://api.recaptcha.net/challenge?k=%s";
 	
+	/**
+	 * All languages in which the recaptcha widget is available.
+	 *
+	 * @see http://recaptcha.net/apidocs/captcha/client.html
+	 * @var array
+	 */
+	protected static $valid_languages = array(
+		'en',
+		'nl',
+		'fr',
+		'de',
+		'pt',
+		'ru',
+		'es',
+		'tr',
+	);
+	
 	
 	public function Field() {
-		if(empty($this->publicApiKey) || empty($this->privateApiKey)) {
+		if(empty(self::$public_api_key) || empty(self::$private_api_key)) {
 			user_error('RecaptchaField::FieldHolder() Please specify valid Recaptcha Keys', E_USER_ERROR);
 		}
 		
@@ -120,15 +110,23 @@ class RecaptchaField extends DatalessField {
 			Requirements::customScript("var RecaptchaOptions = " . $this->getJsOptionsString());
 		}
 		
+		$previousError = Session::get("FormField.{$this->form->FormName()}.{$this->Name()}.error");
+		Session::clear("FormField.{$this->form->FormName()}.{$this->Name()}.error");
+		
+		// iframe (fallback)
 		$iframeURL = sprintf(
 			"%s/noscript?k=%s",
 			($this->useSSL) ? self::$api_ssl_server : self::$api_server,
-			$this->publicApiKey
+			self::$public_api_key
 		);
-		if(!empty($this->errorString)) $iframeURL .= "&error={$this->errorString}";
+		if(!empty($previousError)) $iframeURL .= "&error={$previousError}";
+		
+		// js (main logic)
+		$jsURL = sprintf(self::$recaptcha_js_url, self::$public_api_key);
+		if(!empty($previousError)) $jsURL .= "&error={$previousError}";
 		
 		$html = '
-			<script type="text/javascript" src="' . sprintf(self::$recaptcha_js_url, $this->publicApiKey) . '">
+			<script type="text/javascript" src="' . $jsURL . '">
 			</script>
 		';
 		$html .= '<noscript>
@@ -212,27 +210,21 @@ HTML;
 			return false;
 		}
 
-		$response = HTTP::sendPostRequest(
-			self::$api_verify_server,
-			'/verify',
-			array(
-				'privatekey' => $this->privateApiKey,
-				'remoteip' => $_SERVER["REMOTE_ADDR"],
-				'challenge' => $_REQUEST['recaptcha_challenge_field'],
-				'response' => $_REQUEST['recaptcha_response_field'],
-			)
-		);
+		$response = $this->recaptchaHTTPPost($_REQUEST['recaptcha_challenge_field'], $_REQUEST['recaptcha_response_field']);
 		
 		// get the payload of the response and split it by newlines
 		$response = explode("\r\n\r\n", $response, 2);
-		list($misc, $isValid, $error) = explode("\n", $response[1]);
+		
+		list($isValid, $error) = explode("\n", $response[1]);
 		
 		if($isValid != 'true') {
 			if(trim($error) != 'incorrect-captcha-sol') {
-				user_error("RecatpchaField::validate(): Recaptcha-service error: '{$error}", E_USER_ERROR);
+				user_error("RecatpchaField::validate(): Recaptcha-service error: '{$error}'", E_USER_ERROR);
 				return false;
 			} else {
-				$this->errorString = trim($error);
+				// Internal error-string returned by recaptcha, e.g. "incorrect-captcha-sol". 
+				// Used to generate the new iframe-url/js-url after form-refresh.
+				Session::set("FormField.{$this->form->FormName()}.{$this->Name()}.error", trim($error)); 
 				$validator->validationError(
 					$this->name, 
 					_t(
@@ -250,6 +242,46 @@ HTML;
 		
 		return true;
 	}
+	
+	/**
+	 * Fires off a HTTP-POST request
+	 * 
+	 * @see Based on http://recaptcha.net/plugins/php/
+	 * @param string $challengeStr
+	 * @param string $responseStr
+	 * @return string Raw HTTP-response
+	 */
+	protected function recaptchaHTTPPost($challengeStr, $responseStr) {
+        $host = self::$api_verify_server;
+        $port = 80;
+		$path = '/verify';
+		$req = http_build_query(array(
+			'privatekey' => self::$private_api_key,
+			'remoteip' => $_SERVER["REMOTE_ADDR"],
+			'challenge' => $challengeStr,
+			'response' => $responseStr,
+		));
+
+		$http_request  = "POST $path HTTP/1.0\r\n";
+        $http_request .= "Host: $host\r\n";
+        $http_request .= "Content-Type: application/x-www-form-urlencoded;\r\n";
+        $http_request .= "Content-Length: " . strlen($req) . "\r\n";
+        $http_request .= "User-Agent: reCAPTCHA/PHP\r\n";
+        $http_request .= "\r\n";
+        $http_request .= $req;
+
+        if(false == ($fs = fsockopen($host, $port, $errno, $errstr, 10))) {
+			user_error ('RecaptchaField::recaptchaHTTPPost(): Could not open socket');
+        }
+        fwrite($fs, $http_request);
+
+        $response = '';
+        while(!feof($fs))
+                $response .= fgets($fs, 1160); // One TCP-IP packet
+        fclose($fs);
+
+        return $response;
+}
 	
 }
 ?>
