@@ -171,12 +171,14 @@ HTML;
 		}
 		
 		$js = "{";
+		$i=1;
 		foreach($this->jsOptions as $k => $v) {
 			$js .= "'{$k}':'{$v}'";
-			if(current($this->jsOptions) < count($this->jsOptions)) $js .= ',';
+			if($i < count($this->jsOptions)) $js .= ',';
+			$i++;
 		}
 		$js .= "}";
-		
+
 		return $js;
 	}
 	
