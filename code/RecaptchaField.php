@@ -17,6 +17,8 @@
  * @see http://recaptcha.net
  * @see http://recaptcha.net/api/getkey
  * @version 0.2
+ * 
+ * @module recaptcha
  */
 class RecaptchaField extends DatalessField {
 	
