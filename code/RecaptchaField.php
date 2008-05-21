@@ -43,6 +43,14 @@ class RecaptchaField extends DatalessField {
 	public $jsOptions = array();
 	
 	/**
+	 * Use Ajax instead of iframe inclusion.
+	 * 
+	 * @see http://recaptcha.net/apidocs/captcha/client.html
+	 * @var boolean
+	 */
+	public $useAjaxAPI = false;
+	
+	/**
 	 * Your public API key for a specific domain (get one at http://recaptcha.net/api/getkey)
 	 *
 	 * @var string
@@ -86,6 +94,13 @@ class RecaptchaField extends DatalessField {
 	public static $recaptcha_js_url = "http://api.recaptcha.net/challenge?k=%s";
 	
 	/**
+	 * URL to use when {@link $useAjaxAPI} is true.
+	 *
+	 * @var string
+	 */
+	public static $recaptcha_ajax_url = "http://api.recaptcha.net/js/recaptcha_ajax.js";
+	
+	/**
 	 * All languages in which the recaptcha widget is available.
 	 *
 	 * @see http://recaptcha.net/apidocs/captcha/client.html
@@ -114,7 +129,7 @@ class RecaptchaField extends DatalessField {
 		
 		$previousError = Session::get("FormField.{$this->form->FormName()}.{$this->Name()}.error");
 		Session::clear("FormField.{$this->form->FormName()}.{$this->Name()}.error");
-		
+
 		// iframe (fallback)
 		$iframeURL = sprintf(
 			"%s/noscript?k=%s",
@@ -126,11 +141,29 @@ class RecaptchaField extends DatalessField {
 		// js (main logic)
 		$jsURL = sprintf(self::$recaptcha_js_url, self::$public_api_key);
 		if(!empty($previousError)) $jsURL .= "&error={$previousError}";
+	
 		
-		$html = '
-			<script type="text/javascript" src="' . $jsURL . '">
-			</script>
-		';
+		if($this->useAjaxAPI) {
+			Requirements::javascript(self::$recaptcha_ajax_url);
+			$html = '
+				<script type="text/javascript">
+					//<![CDATA[
+					Recaptcha.create("' . self::$public_api_key . '",
+					"' . $this->Name() . '", {
+					   theme: "red",
+					   callback: Recaptcha.focus_response_field
+					});
+				//]]>
+				</script>
+			';
+		} else {
+			$html = '
+				<script type="text/javascript" src="' . $jsURL . '">
+				</script>
+			';
+		}
+		
+		// noscript fallback
 		$html .= '<noscript>
 			<iframe src="' .$iframeURL . '" height="300" width="500" frameborder="0">
 			</iframe>
