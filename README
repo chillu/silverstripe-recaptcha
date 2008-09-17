@@ -1,22 +1,32 @@
-------------------------------
+###############################################
 Recaptcha FormField Module
-------------------------------
+###############################################
 
 January 30, 2008
 
 Provides aFormField which allows form to validate for non-bot submissions
  by giving them a challenge to decrypt an image.
 
-REQUIREMENTS
-------------
+Maintainer Contact
+-----------------------------------------------
+Ingo Schommer (Nickname: ischommer, chillu)
+<ingo (at) silverstripe (dot) com>
+
+Requirements
+-----------------------------------------------
 At least SilverStripe 2.2.1
 
-DOCUMENTATION
--------------
+Documentation
+-----------------------------------------------
 http://doc.silverstripe.com/doku.php?id=modules:recaptcha
 
-INSTALL
--------
-
+Installation Instructions
+-----------------------------------------------
 1) Copy the modules:recaptcha directory into your main SilverStripe directory
 2) run ?flush=1
+
+Usage Overview
+-----------------------------------------------
+
+Known issues:
+-----------------------------------------------
