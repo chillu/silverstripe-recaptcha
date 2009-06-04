@@ -27,10 +27,10 @@ class RecaptchaProtector implements SpamProtector {
 		$this->field = new RecaptchaField("RecaptchaField", "Captcha", null, $form);
 
 		if ($before && $form->Fields()->fieldByName($before)) {
-			$form->Fields()->insertBefore($this->mollomField, $before);
+			$form->Fields()->insertBefore($this->field, $before);
 		}
 		else {
-			$form->Fields()->push($this->mollomField);
+			$form->Fields()->push($this->field);
 		}
 		
 		return $form->Fields();
