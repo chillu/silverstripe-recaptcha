@@ -5,3 +5,6 @@
 - switched to static configuration of API keys
 - session-based errors passed through to recaptcha
 - using custom HTTP POST generation (HTTP::sendPostRequest() has performance issues here)
+
+0.3
+- Now sits ontop of Spam Protection Field

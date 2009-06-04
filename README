@@ -14,10 +14,12 @@ Ingo Schommer (Nickname: ischommer, chillu)
 
 Requirements
 -----------------------------------------------
-At least SilverStripe 2.2.1
+At least SilverStripe 2.3
+Requires SpamProtectionModule
 
 Documentation
 -----------------------------------------------
+http://doc.silverstripe.com/doku.php?id=modules:spamprotection
 http://doc.silverstripe.com/doku.php?id=modules:recaptcha
 
 Installation Instructions
