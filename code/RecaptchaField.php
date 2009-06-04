@@ -20,7 +20,7 @@
  * 
  * @module recaptcha
  */
-class RecaptchaField extends SpamProtecterField {
+class RecaptchaField extends SpamProtectorField {
 	
 	/**
 	 * Use secure connection for API-calls
