@@ -7,4 +7,6 @@
 - using custom HTTP POST generation (HTTP::sendPostRequest() has performance issues here)
 
 0.3
-- Now sits ontop of Spam Protection Field
+- Now sits ontop of Spam Protection Field which has automatic hooks into default forms.
+	Also enables recaptcha to be included in a userform
+	
