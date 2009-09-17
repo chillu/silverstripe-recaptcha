@@ -8,40 +8,21 @@
 
 class RecaptchaProtector implements SpamProtector {
 	
-	protected $field;
-	
 	/**
 	 * Return the Field that we will use in this protector
 	 * 
 	 * @return string
 	 */
-	function getFieldName() {
-		return 'RecaptchaField';
+	function getFormField($name = "RecaptchaField", $title = "Captcha", $value = null, $form = null, $rightTitle = null) {
+		return new RecaptchaField($name, $title, $value, $form, $rightTitle);
 	}
 	
 	/**
-	 * @return bool 
+	 * Needed for the interface. Recaptcha does not have a feedback loop
+	 *
+	 * @return boolean
 	 */
-	function updateForm($form, $before=null, $fieldsToSpamServiceMapping=null) {
-
-		$this->field = new RecaptchaField("RecaptchaField", "Captcha", null, $form);
-
-		if ($before && $form->Fields()->fieldByName($before)) {
-			$form->Fields()->insertBefore($this->field, $before);
-		}
-		else {
-			$form->Fields()->push($this->field);
-		}
-		
-		return $form->Fields();
-	}
-	
-	function setFieldMapping($fieldToPostTitle, $fieldsToPostBody=null, $fieldToAuthorName=null, $fieldToAuthorUrl=null, $fieldToAuthorEmail=null, $fieldToAuthorOpenId=null) {
-	
-	}
-	
 	function sendFeedback($object = null, $feedback = "") {
 		return false;
 	}
 }
-?>
