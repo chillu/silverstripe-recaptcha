@@ -288,8 +288,8 @@ HTML;
 	 * @return string Raw HTTP-response
 	 */
 	protected function recaptchaHTTPPost($challengeStr, $responseStr) {
-        $host = self::$api_verify_server;
-        $port = 80;
+		$host = self::$api_verify_server;
+		$port = 80;
 		$path = '/verify';
 		$req = http_build_query(array(
 			'privatekey' => self::$private_api_key,
@@ -299,25 +299,26 @@ HTML;
 		));
 
 		$http_request  = "POST $path HTTP/1.0\r\n";
-        $http_request .= "Host: $host\r\n";
-        $http_request .= "Content-Type: application/x-www-form-urlencoded;\r\n";
-        $http_request .= "Content-Length: " . strlen($req) . "\r\n";
-        $http_request .= "User-Agent: reCAPTCHA/PHP\r\n";
-        $http_request .= "\r\n";
-        $http_request .= $req;
+		$http_request .= "Host: $host\r\n";
+		$http_request .= "Content-Type: application/x-www-form-urlencoded;\r\n";
+		$http_request .= "Content-Length: " . strlen($req) . "\r\n";
+		$http_request .= "User-Agent: reCAPTCHA/PHP\r\n";
+		$http_request .= "\r\n";
+		$http_request .= $req;
 
-        if(false == ($fs = fsockopen($host, $port, $errno, $errstr, 10))) {
+		$fs = fsockopen($host, $port, $errno, $errstr, 10);
+		if(!$fs) {
 			user_error ('RecaptchaField::recaptchaHTTPPost(): Could not open socket');
-        }
-        fwrite($fs, $http_request);
+		}
 
-        $response = '';
-        while(!feof($fs))
-                $response .= fgets($fs, 1160); // One TCP-IP packet
-        fclose($fs);
+		fwrite($fs, $http_request);
 
-        return $response;
+		$response = '';
+		while(!feof($fs)) {
+			$response .= fgets($fs, 1160); // One TCP-IP packet
+		}
+
+		fclose($fs);
+		return $response;
+	}
 }
-	
-}
-?>
