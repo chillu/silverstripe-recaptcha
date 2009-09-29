@@ -247,6 +247,20 @@ HTML;
 		}
 
 		$response = $this->recaptchaHTTPPost($_REQUEST['recaptcha_challenge_field'], $_REQUEST['recaptcha_response_field']);
+		if(!$response) {
+			$validator->validationError(
+				$this->name, 
+				_t(
+					'RecaptchaField.NORESPONSE',
+					"The recaptcha service gave no response. Please try again later.",
+					PR_MEDIUM,
+					"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
+				), 
+				"validation", 
+				false
+			);
+			return false;			
+		}
 		
 		// get the payload of the response and split it by newlines
 		$response = explode("\r\n\r\n", $response, 2);
@@ -307,8 +321,9 @@ HTML;
 		$http_request .= $req;
 
 		$fs = fsockopen($host, $port, $errno, $errstr, 10);
-		if(!$fs) {
-			user_error ('RecaptchaField::recaptchaHTTPPost(): Could not open socket');
+		if($fs) {
+			user_error('RecaptchaField::recaptchaHTTPPost(): Could not open socket');
+			return false;
 		}
 
 		fwrite($fs, $http_request);
