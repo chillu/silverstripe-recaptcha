@@ -321,7 +321,7 @@ HTML;
 		$http_request .= $req;
 
 		$fs = fsockopen($host, $port, $errno, $errstr, 10);
-		if($fs) {
+		if(!$fs) {
 			user_error('RecaptchaField::recaptchaHTTPPost(): Could not open socket');
 			return false;
 		}
