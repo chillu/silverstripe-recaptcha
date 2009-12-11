@@ -168,7 +168,7 @@ class RecaptchaField extends SpamProtectorField {
 			</iframe>
 			<br />
 			<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
-			<input type="hidden" name="recaptcha_response_field" value="manual_challenge">
+			<input type="hidden" name="recaptcha_response_field" value="manual_challenge" />
 			</noscript>';
 	
 		return $html;
