@@ -116,12 +116,19 @@ class RecaptchaField extends SpamProtectorField {
 		'tr',
 	);
 	
+	function __construct($name, $title = null, $value = null, $form = null, $rightTitle = null) {
+		parent::__construct($name, $title, $value, $form, $rightTitle);
+		
+		// try to auto-detect language-settings
+		$lang = substr(i18n::get_locale(), 0, 2);
+		if(in_array($lang, self::$valid_languages)) $this->jsOptions['lang'] = $lang;
+	}
 	
 	public function Field() {
 		if(empty(self::$public_api_key) || empty(self::$private_api_key)) {
 			user_error('RecaptchaField::FieldHolder() Please specify valid Recaptcha Keys', E_USER_ERROR);
 		}
-		
+
 		if(!empty($this->jsOptions)) {
 			Requirements::customScript("var RecaptchaOptions = " . $this->getJsOptionsString());
 		}
@@ -198,12 +205,6 @@ HTML;
 	 * @return string
 	 */
 	public function getJsOptionsString() {
-		// try to auto-detect language-settings
-		$lang = substr(i18n::get_locale(), 0, 2);
-		if(!isset($this->jsOptions['lang']) && in_array($lang, self::$valid_languages)) {
-			$this->jsOptions['lang'] = $lang;
-		}
-		
 		$js = "{";
 		$i=1;
 		foreach($this->jsOptions as $k => $v) {
