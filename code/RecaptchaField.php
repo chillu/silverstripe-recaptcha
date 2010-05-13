@@ -34,12 +34,22 @@ class RecaptchaField extends SpamProtectorField {
 	 * <example>
 	 * "array('theme' => 'white')
 	 * </example>
-	 * Note: Only available if {@link $useJavascript} is turned on.
 	 * 
 	 * @see http://recaptcha.net/apidocs/captcha/client.html
 	 * @var array
 	 */
 	public $jsOptions = array();
+	
+	/**
+	 * Javasript-object formatted as a string,
+	 * which can contain options about the used theme/language etc.
+	 * <example>
+	 * "array('theme' => 'white')
+	 * </example>
+	 * 
+	 * This is similar to {@link $jsOptions}, but sets the default values used by all RecaptchaFields.
+	 */
+	public static $js_options = array();
 	
 	/**
 	 * Use Ajax instead of iframe inclusion.
@@ -62,7 +72,7 @@ class RecaptchaField extends SpamProtectorField {
 	 * @var string
 	 */
 	public static $private_api_key = '';
-	
+
 	/**
 	 * Standard API server addess
 	 *
@@ -119,6 +129,8 @@ class RecaptchaField extends SpamProtectorField {
 	function __construct($name, $title = null, $value = null, $form = null, $rightTitle = null) {
 		parent::__construct($name, $title, $value, $form, $rightTitle);
 		
+		$this->jsOptions = self::$js_options;
+		
 		// try to auto-detect language-settings
 		$lang = substr(i18n::get_locale(), 0, 2);
 		if(in_array($lang, self::$valid_languages)) $this->jsOptions['lang'] = $lang;
@@ -129,8 +141,14 @@ class RecaptchaField extends SpamProtectorField {
 			user_error('RecaptchaField::FieldHolder() Please specify valid Recaptcha Keys', E_USER_ERROR);
 		}
 
+		$html = '';
+		
+		// Add javascript options as a <script> tag preceeding the JS that actually includes the
+		// recaptcha
 		if(!empty($this->jsOptions)) {
-			Requirements::customScript("var RecaptchaOptions = " . $this->getJsOptionsString());
+			$html .= "<script type=\"text/javascript\">//<![CDATA[\n"
+				. "var RecaptchaOptions = " . $this->getJsOptionsString()
+				. "//]]></script>";
 		}
 		
 		$previousError = Session::get("FormField.{$this->form->FormName()}.{$this->Name()}.error");
@@ -151,19 +169,18 @@ class RecaptchaField extends SpamProtectorField {
 		
 		if($this->useAjaxAPI) {
 			Requirements::javascript(self::$recaptcha_ajax_url);
-			$html = '
+			$html .= '
 				<script type="text/javascript">
 					//<![CDATA[
 					Recaptcha.create("' . self::$public_api_key . '",
 					"' . $this->Name() . '", {
-					   theme: "red",
 					   callback: Recaptcha.focus_response_field
 					});
 				//]]>
 				</script>
 			';
 		} else {
-			$html = '
+			$html .= '
 				<script type="text/javascript" src="' . $jsURL . '">
 				</script>
 			';
