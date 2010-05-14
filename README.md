@@ -25,7 +25,7 @@ by giving them a challenge to decrypt an image.
  * Copy the `recaptcha` directory into your main SilverStripe webroot
  * Run ?flush=1
 
-This should go in your `mysite/_config.php`. You can get an free API key at [http://recaptcha.net/api/getkey].
+This should go in your `mysite/_config.php`. You can get an free API key at [http://recaptcha.net/api/getkey](recatcha.net).
 
 	RecaptchaField::$public_api_key = '<publickey>';
 	RecaptchaField::$private_api_key = '<privatekey>';
