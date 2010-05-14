@@ -23,7 +23,35 @@ by giving them a challenge to decrypt an image.
 ## Installation
 
  * Copy the `recaptcha` directory into your main SilverStripe webroot
- * run ?flush=1
+ * Run ?flush=1
+
+This should go in your `mysite/_config.php`. You can get an free API key at [http://recaptcha.net/api/getkey].
+
+	RecaptchaField::$public_api_key = '<publickey>';
+	RecaptchaField::$private_api_key = '<privatekey>';
+	
+
+## Usage
+
+
+### As a Standalone Field
+
+If you want to use Recaptcha field by itself, you can simply just include it as a field in your form.
+
+	$recaptchaField = new RecaptchaField('MyCaptcha');
+	$recaptchaField->jsOptions = array('theme' => 'clean'); // optional
+	
+See [http://recaptcha.net/apidocs/captcha/](Recaptcha API docs) for more configuration options.
+
+### Integration with Spamprotection module
+
+This requires the [[:modules:spamprotection|spamprotection module]] to be installed, see its documentation for details. You can use this field to protect any built informs on your website, including user comments in the [[:modules:blog]] module. 
+
+Configuration example in `mysite/_config.php`
+
+	SpamProtectorManager::set_spam_protector("RecaptchaProtector");
+
+Then once you have setup this config you will need to include the spam protector field as per the instructions on the [[modules:spamprotection|spamprotection module]] page.
 
 ## Known issues:
 
