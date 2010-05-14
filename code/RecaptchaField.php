@@ -1,5 +1,9 @@
 <?php
 /**
+ * @package recaptcha
+ */
+
+/**
  * Provides an {@link FormField} which allows form to validate for non-bot submissions
  * by giving them a challenge to decrypt an image.
  * Generation and validation of captchas is handled on external server.
@@ -16,8 +20,6 @@
  * 
  * @see http://recaptcha.net
  * @see http://recaptcha.net/api/getkey
- * 
- * @module recaptcha
  */
 class RecaptchaField extends SpamProtectorField {
 	
@@ -108,6 +110,11 @@ class RecaptchaField extends SpamProtectorField {
 	 * @var string
 	 */
 	public static $recaptcha_ajax_url = "http://api.recaptcha.net/js/recaptcha_ajax.js";
+	
+	/**
+	 * @var string
+	 */
+	public static $httpclient_class = 'RecaptchaField_HTTPClient';
 	
 	/**
 	 * All languages in which the recaptcha widget is available.
@@ -280,9 +287,7 @@ HTML;
 		}
 		
 		// get the payload of the response and split it by newlines
-		$response = explode("\r\n\r\n", $response, 2);
-		
-		list($isValid, $error) = explode("\n", $response[1]);
+		list($isValid, $error) = explode("\n", $response, 2);
 
 		if($isValid != 'true') {
 			if(trim($error) != 'incorrect-captcha-sol') {
@@ -319,43 +324,62 @@ HTML;
 	 * @return string Raw HTTP-response
 	 */
 	protected function recaptchaHTTPPost($challengeStr, $responseStr) {
-		$host = self::$api_verify_server;
-		$port = 80;
-		$path = '/verify';
-		$req = http_build_query(array(
+		$postVars = array(
 			'privatekey' => self::$private_api_key,
 			'remoteip' => $_SERVER["REMOTE_ADDR"],
 			'challenge' => $challengeStr,
 			'response' => $responseStr,
-		));
-
-		$http_request  = "POST $path HTTP/1.0\r\n";
-		$http_request .= "Host: $host\r\n";
-		$http_request .= "Content-Type: application/x-www-form-urlencoded;\r\n";
-		$http_request .= "Content-Length: " . strlen($req) . "\r\n";
-		$http_request .= "User-Agent: reCAPTCHA/PHP\r\n";
-		$http_request .= "\r\n";
-		$http_request .= $req;
-
-		$fs = fsockopen($host, $port, $errno, $errstr, 10);
-		if(!$fs) {
-			user_error('RecaptchaField::recaptchaHTTPPost(): Could not open socket');
-			return false;
+		);
+		$client = $this->getHTTPClient();
+		$response = $client->post(self::$api_verify_server . '/verify', $postVars);
+		
+		return $response->getBody();
+	}
+	
+	/**
+	 * @param RecaptchaField_HTTPClient
+	 */
+	function setHTTPClient($client) {
+		$this->client = $client;
+	}
+	
+	/**
+	 * @return RecaptchaField_HTTPClient
+	 */
+	function getHTTPClient() {
+		if(!$this->client) {
+			$class = self::$httpclient_class;
+			$this->client = new $class();
 		}
+		
+		return $this->client;
+	}
+}
 
-		stream_set_timeout($fs, 10); // time out after 10 seconds for read/write 
-		fwrite($fs, $http_request);
+/**
+ * Simple HTTP client, mainly to make it mockable.
+ */
+class RecaptchaField_HTTPClient extends Object {
+	
+	/**
+	 * @param String $url
+	 * @param Array $data
+	 * @return String HTTPResponse
+	 */
+	function post($url, $postVars) {
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, 'reCAPTCHA/PHP');
+		// we need application/x-www-form-urlencoded
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postVars)); 
+		$response = curl_exec($ch);
 
-		$response = '';
-		$timed_out = false;
-		while(!$timed_out && !feof($fs)) {
-			$response .= fgets($fs, 1160); // One TCP-IP packet
-			$timed_out = stream_get_meta_data($fs);
-			$timed_out = $timed_out['timed_out'];
+		if(class_exists('SS_HTTPResponse')) {
+			return new SS_HTTPResponse($response);
+		} else {
+			// 2.3 backwards compat
+			return new HTTPResponse($response);
 		}
-
-		fclose($fs);
-
-		return $response;
 	}
 }

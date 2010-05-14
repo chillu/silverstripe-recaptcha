@@ -1,11 +1,11 @@
 <?php
-
 /**
- * Protecter class to handle spam protection interface 
- *
  * @package recaptcha
  */
 
+/**
+ * Protecter class to handle spam protection interface 
+ */
 class RecaptchaProtector implements SpamProtector {
 	
 	/**
