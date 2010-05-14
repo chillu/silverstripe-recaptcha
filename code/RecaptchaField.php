@@ -283,7 +283,7 @@ HTML;
 		$response = explode("\r\n\r\n", $response, 2);
 		
 		list($isValid, $error) = explode("\n", $response[1]);
-		
+
 		if($isValid != 'true') {
 			if(trim($error) != 'incorrect-captcha-sol') {
 				user_error("RecatpchaField::validate(): Recaptcha-service error: '{$error}'", E_USER_ERROR);
@@ -343,14 +343,19 @@ HTML;
 			return false;
 		}
 
+		stream_set_timeout($fs, 10); // time out after 10 seconds for read/write 
 		fwrite($fs, $http_request);
 
 		$response = '';
-		while(!feof($fs)) {
+		$timed_out = false;
+		while(!$timed_out && !feof($fs)) {
 			$response .= fgets($fs, 1160); // One TCP-IP packet
+			$timed_out = stream_get_meta_data($fs);
+			$timed_out = $timed_out['timed_out'];
 		}
 
 		fclose($fs);
+
 		return $response;
 	}
 }
