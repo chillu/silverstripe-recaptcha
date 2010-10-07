@@ -74,27 +74,13 @@ class RecaptchaField extends SpamProtectorField {
 	 * @var string
 	 */
 	public static $private_api_key = '';
-
-	/**
-	 * Standard API server addess
-	 *
-	 * @var string
-	 */
-	public static $api_server = "http://api.recaptcha.net";
-	
-	/**
-	 * Secure API server address
-	 *
-	 * @var string
-	 */
-	public static $api_ssl_server = "https://api-secure.recaptcha.net";
 	
 	/**
 	 * Verify API server address (relative)
 	 *
 	 * @var string
 	 */
-	public static $api_verify_server = 'api-verify.recaptcha.net';
+	public static $api_verify_server = 'www.google.com/recaptcha/api/verify';
 	
 	/**
 	 * Javascript-address which includes necessary logic from the recaptcha-server.
@@ -102,14 +88,19 @@ class RecaptchaField extends SpamProtectorField {
 	 * 
 	 * @var string
 	 */
-	public static $recaptcha_js_url = "http://api.recaptcha.net/challenge?k=%s";
+	public static $recaptcha_js_url = "www.google.com/recaptcha/api/challenge?k=%s";
 	
 	/**
 	 * URL to use when {@link $useAjaxAPI} is true.
 	 *
 	 * @var string
 	 */
-	public static $recaptcha_ajax_url = "http://api.recaptcha.net/js/recaptcha_ajax.js";
+	public static $recaptcha_ajax_url = "www.google.com/recaptcha/api/js/recaptcha_ajax.js";
+	
+	/**
+	 * @var string
+	 */
+	public static $recaptcha_noscript_url = "www.google.com/recaptcha/api/noscript?k=%s";
 	
 	/**
 	 * @var string
@@ -162,20 +153,20 @@ class RecaptchaField extends SpamProtectorField {
 		Session::clear("FormField.{$this->form->FormName()}.{$this->Name()}.error");
 
 		// iframe (fallback)
-		$iframeURL = sprintf(
-			"%s/noscript?k=%s",
-			($this->useSSL) ? self::$api_ssl_server : self::$api_server,
-			self::$public_api_key
-		);
+		$iframeURL = ($this->useSSL) ? 'https://' : 'http://';
+		$iframeURL .= sprintf(self::$recaptcha_noscript_url, self::$public_api_key);
 		if(!empty($previousError)) $iframeURL .= "&error={$previousError}";
 		
 		// js (main logic)
-		$jsURL = sprintf(self::$recaptcha_js_url, self::$public_api_key);
+		$jsURL = ($this->useSSL) ? 'https://' : 'http://';
+		$jsURL .= sprintf(self::$recaptcha_js_url, self::$public_api_key);
 		if(!empty($previousError)) $jsURL .= "&error={$previousError}";
 	
 		
 		if($this->useAjaxAPI) {
-			Requirements::javascript(self::$recaptcha_ajax_url);
+			$ajaxURL = ($this->useSSL) ? 'https://' : 'http://';
+			$ajaxURL .= self::$recaptcha_ajax_url;
+			Requirements::javascript($ajaxURL);
 			$html .= '
 				<script type="text/javascript">
 					//<![CDATA[
@@ -331,7 +322,9 @@ HTML;
 			'response' => $responseStr,
 		);
 		$client = $this->getHTTPClient();
-		$response = $client->post(self::$api_verify_server . '/verify', $postVars);
+		$url = ($this->useSSL) ? 'https://' : 'http://';
+		$url .= self::$api_verify_server;
+		$response = $client->post($url, $postVars);
 		
 		return $response->getBody();
 	}
