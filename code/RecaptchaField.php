@@ -325,7 +325,7 @@ HTML;
 		$url = ($this->useSSL) ? 'https://' : 'http://';
 		$url .= self::$api_verify_server;
 		$response = $client->post($url, $postVars);
-		
+
 		return $response->getBody();
 	}
 	
@@ -369,10 +369,13 @@ class RecaptchaField_HTTPClient extends Object {
 		$response = curl_exec($ch);
 
 		if(class_exists('SS_HTTPResponse')) {
-			return new SS_HTTPResponse($response);
+			$responseObj = new SS_HTTPResponse();
 		} else {
 			// 2.3 backwards compat
-			return new HTTPResponse($response);
+			$responseObj = new HTTPResponse();
 		}
+		$responseObj->setBody($response); // 2.2. compat
+		
+		return $responseObj;
 	}
 }
