@@ -281,7 +281,9 @@ HTML;
 		list($isValid, $error) = explode("\n", $response, 2);
 
 		if($isValid != 'true') {
-			if(trim($error) != 'incorrect-captcha-sol') {
+			// Count some errors as "user level", meaning they raise a validation error rather than a system error
+			$userLevelErrors = array('incorrect-captcha-sol', 'invalid-request-cookie');
+			if(!in_array(trim($error), $userLevelErrors)) {
 				user_error("RecatpchaField::validate(): Recaptcha-service error: '{$error}'", E_USER_ERROR);
 				return false;
 			} else {
