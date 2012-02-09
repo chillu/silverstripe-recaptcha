@@ -56,8 +56,41 @@ Then once you have setup this config you will need to include the spam protector
 
 ## Known issues:
 
+### Problems with page doctype XHTML
+
 ReCAPTCHA current does not work if the page doctype is XHTML. The API returns 
 Javascript which uses "document.write", which is not supported in XHTML. 
 A work-around is to always use the no-script version of the module (modify the
 relevant lines in RecaptchaField.php), or to switch your webpage's doctype to 
 HTML 4. See: http://www.w3schools.com/tags/tag_DOCTYPE.asp
+
+### Problems with IE9
+There is an issue that with certain site configurations, forms just won't submit in IE9.    
+Several threads are pointing to that IE9 and reCaptcha just won't work together, and this thread suggests to force Internet Explorer in IE8 mode:
+http://answers.microsoft.com/en-us/ie/forum/ie9-windows_7/ie9-is-not-capturing-recaptcha-form-fields/6479d1f0-6f67-e011-8dfc-68b599b31bf5?msgId=44883943-036d-e011-8dfc-68b599b31bf5&page=1
+
+What can be done to circumvent this (but isn't optimal, as many sites look much better in IE9/10 than in IE8), is to force all `UserDefineForms` pages to be rendered in IE8 mode like described below (off course that can be extended to include other page types as well).    
+Though it's not optimal at all, it can be a good trade-off, considering that users are at least able to submit forms.
+
+```php
+/*
+ * Forcing the browser to render in IE8 mode for UserDefineForms
+ * This is due to problems with IE9 and reCaptcha
+ */
+public function ForceIE8(){
+	$class = $this->ClassName;
+	if ($class == 'UserDefinedForm') {
+		return true;
+	}
+}
+```
+...and adding this as first in the head tag
+
+```html
+<% if ForceIE8 %>
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" >
+<% end_if %>
+```
+
+
+
