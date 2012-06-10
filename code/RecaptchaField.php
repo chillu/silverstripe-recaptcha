@@ -134,7 +134,7 @@ class RecaptchaField extends SpamProtectorField {
 		if(in_array($lang, self::$valid_languages)) $this->jsOptions['lang'] = $lang;
 	}
 	
-	public function Field() {
+	public function Field($properties = array()) {
 		if(empty(self::$public_api_key) || empty(self::$private_api_key)) {
 			user_error('RecaptchaField::FieldHolder() Please specify valid Recaptcha Keys', E_USER_ERROR);
 		}
@@ -195,7 +195,7 @@ class RecaptchaField extends SpamProtectorField {
 		return $html;
 	}
 	
-	function FieldHolder() {
+	function FieldHolder($properties = array()) {
 		$Title = $this->XML_val('Title');
 		$Message = $this->XML_val('Message');
 		$MessageType = $this->XML_val('MessageType');
