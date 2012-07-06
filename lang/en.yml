@@ -1,0 +1,5 @@
+en:
+  RecaptchaField:
+    EMPTY: Please answer the captcha question
+    VALIDSOLUTION: Your answer didn't match the captcha words, please try again.
+    NORESPONSE: The recaptcha service gave no response. Please try again later.

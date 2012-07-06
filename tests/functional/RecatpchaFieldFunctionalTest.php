@@ -46,7 +46,7 @@ class RecatpchaFieldFunctionalTest extends FunctionalTest {
 		$els = $this->cssParser()->getBySelector('#MyRecaptchaField span.validation');
 		// TODO Messed up newlines, no idea why...
 		$this->assertEquals(
-			"Your answer didn't match the captcha words, please try again",
+			"Your answer didn't match the captcha words, please try again.",
 			str_replace(PHP_EOL, ' ', (string)$els[0])
 		);
 	}
@@ -65,10 +65,10 @@ class RecatpchaFieldFunctionalTest_Controller extends Controller implements Test
 		$form = new Form(
 			$this,
 			'Form',
-			new FieldSet(
+			new FieldList(
 				$f = new RecaptchaField('MyRecaptchaField')
 			),
-			new FieldSet(
+			new FieldList(
 				new FormAction('doSubmit', 'submit')
 			)
 		);
