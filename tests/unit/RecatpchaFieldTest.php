@@ -6,7 +6,7 @@
 class RecatpchaFieldTest extends SapphireTest {
 	
 	function testValidate() {
-		$form = new Form(new Controller(), 'Form', new FieldSet(), new FieldSet());
+		$form = new Form(new Controller(), 'Form', new FieldList(), new FieldList());
 		$f = new RecaptchaField('MyField');
 		$f->setHTTPClient(new RecatpchaFieldTest_HTTPClient());
 		$f->setForm($form);
