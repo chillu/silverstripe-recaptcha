@@ -12,7 +12,7 @@ by giving them a challenge to decrypt an image.
 
 ## Requirements
 
- * SilverStripe 2.3 or newer
+ * SilverStripe 3.0.0 or newer
  * curl PHP module
  * Requires [SpamProtectionModule](http://silverstripe.org/spam-protection-module/)
 
@@ -26,14 +26,12 @@ by giving them a challenge to decrypt an image.
  * Copy the `recaptcha` directory into your main SilverStripe webroot
  * Run ?flush=1
 
-This should go in your `mysite/_config.php`. You can get an free API key at [http://recaptcha.net/api/getkey](recatcha.net).
+This should go in your `mysite/_config.php`. You can get an free API key at [http://www.google.com/recaptcha](https://www.google.com/recaptcha/admin/create)
 
 	RecaptchaField::$public_api_key = '<publickey>';
 	RecaptchaField::$private_api_key = '<privatekey>';
-	
 
 ## Usage
-
 
 ### As a Standalone Field
 
@@ -42,7 +40,7 @@ If you want to use Recaptcha field by itself, you can simply just include it as 
 	$recaptchaField = new RecaptchaField('MyCaptcha');
 	$recaptchaField->jsOptions = array('theme' => 'clean'); // optional
 	
-See [http://recaptcha.net/apidocs/captcha/](Recaptcha API docs) for more configuration options.
+See [Recaptcha API docs](https://developers.google.com/recaptcha/intro) for more configuration options.
 
 ### Integration with Spamprotection module
 
@@ -50,7 +48,7 @@ This requires the [[:modules:spamprotection|spamprotection module]] to be instal
 
 Configuration example in `mysite/_config.php`
 
-	SpamProtectorManager::set_spam_protector("RecaptchaProtector");
+	SpamProtectorManager::set_spam_protector('RecaptchaProtector');
 
 Then once you have setup this config you will need to include the spam protector field as per the instructions on the [[modules:spamprotection|spamprotection module]] page.
 

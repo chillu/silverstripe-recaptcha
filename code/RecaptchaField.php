@@ -124,8 +124,8 @@ class RecaptchaField extends SpamProtectorField {
 		'tr',
 	);
 	
-	function __construct($name, $title = null, $value = null, $form = null, $rightTitle = null) {
-		parent::__construct($name, $title, $value, $form, $rightTitle);
+	function __construct($name, $title = null, $value = null) {
+		parent::__construct($name, $title, $value);
 		
 		$this->jsOptions = self::$js_options;
 		
@@ -148,9 +148,9 @@ class RecaptchaField extends SpamProtectorField {
 				. "var RecaptchaOptions = " . $this->getJsOptionsString()
 				. "//]]></script>";
 		}
-		
-		$previousError = Session::get("FormField.{$this->form->FormName()}.{$this->Name()}.error");
-		Session::clear("FormField.{$this->form->FormName()}.{$this->Name()}.error");
+
+		$previousError = Session::get("FormField.{$this->form->FormName()}.{$this->getName()}.error");
+		Session::clear("FormField.{$this->form->FormName()}.{$this->getName()}.error");
 
 		// iframe (fallback)
 		$iframeURL = ($this->useSSL) ? 'https://' : 'http://';
@@ -171,7 +171,7 @@ class RecaptchaField extends SpamProtectorField {
 				<script type="text/javascript">
 					//<![CDATA[
 					Recaptcha.create("' . self::$public_api_key . '",
-					"' . $this->Name() . '", {
+					"' . $this->getName() . '", {
 					   callback: Recaptcha.focus_response_field
 					});
 				//]]>
@@ -251,7 +251,6 @@ HTML;
 				_t(
 					'RecaptchaField.EMPTY', 
 					"Please answer the captcha question",
-					PR_MEDIUM,
 					"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
 				), 
 				"validation", 
@@ -268,7 +267,6 @@ HTML;
 				_t(
 					'RecaptchaField.NORESPONSE',
 					"The recaptcha service gave no response. Please try again later.",
-					PR_MEDIUM,
 					"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
 				), 
 				"validation", 
@@ -289,13 +287,12 @@ HTML;
 			} else {
 				// Internal error-string returned by recaptcha, e.g. "incorrect-captcha-sol". 
 				// Used to generate the new iframe-url/js-url after form-refresh.
-				Session::set("FormField.{$this->form->FormName()}.{$this->Name()}.error", trim($error)); 
+				Session::set("FormField.{$this->form->FormName()}.{$this->getName()}.error", trim($error)); 
 				$validator->validationError(
 					$this->name, 
 					_t(
 						'RecaptchaField.VALIDSOLUTION', 
 						"Your answer didn't match the captcha words, please try again",
-						PR_MEDIUM,
 						"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
 					), 
 					"validation", 
