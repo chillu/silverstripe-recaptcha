@@ -333,6 +333,7 @@ HTML;
 	 */
 	function setHTTPClient($client) {
 		$this->client = $client;
+		return $this;
 	}
 	
 	/**
