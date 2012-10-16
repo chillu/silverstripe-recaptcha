@@ -13,7 +13,9 @@ class RecaptchaProtector implements SpamProtector {
 	 * 
 	 * @return string
 	 */
-	function getFormField($name = "RecaptchaField", $title = "Captcha", $value = null, $form = null, $rightTitle = null) {
+	function getFormField($name = "RecaptchaField", $title = "Captcha", 
+		$value = null, $form = null, $rightTitle = null
+	) {
 		return new RecaptchaField($name, $title, $value, $form, $rightTitle);
 	}
 	

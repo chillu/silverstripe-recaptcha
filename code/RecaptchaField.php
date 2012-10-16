@@ -16,7 +16,8 @@
  * i18n::set_locale('de_DE');
  * </example>
  * 
- * @todo Does NOT work when the form is submitted via ajax, see http://recaptcha.net/apidocs/captcha/client.html for details on implementation.
+ * @todo Does NOT work when the form is submitted via ajax, 
+ * see http://recaptcha.net/apidocs/captcha/client.html for details on implementation.
  * 
  * @see http://recaptcha.net
  * @see http://recaptcha.net/api/getkey
@@ -251,7 +252,8 @@ HTML;
 				_t(
 					'RecaptchaField.EMPTY', 
 					"Please answer the captcha question",
-					"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
+					"Recaptcha (http://recaptcha.net) provides two words in an image, "
+						. "and expects a user to type them in a textfield"
 				), 
 				"validation", 
 				false
@@ -260,14 +262,19 @@ HTML;
 			return false;
 		}
 
-		$response = $this->recaptchaHTTPPost($_REQUEST['recaptcha_challenge_field'], $_REQUEST['recaptcha_response_field']);
+		$response = $this->recaptchaHTTPPost(
+			$_REQUEST['recaptcha_challenge_field'], 
+			$_REQUEST['recaptcha_response_field']
+		);
+
 		if(!$response) {
 			$validator->validationError(
 				$this->name, 
 				_t(
 					'RecaptchaField.NORESPONSE',
 					"The recaptcha service gave no response. Please try again later.",
-					"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
+					"Recaptcha (http://recaptcha.net) provides two words in an image, "
+						. "and expects a user to type them in a textfield"
 				), 
 				"validation", 
 				false
@@ -293,7 +300,8 @@ HTML;
 					_t(
 						'RecaptchaField.VALIDSOLUTION', 
 						"Your answer didn't match the captcha words, please try again",
-						"Recaptcha (http://recaptcha.net) provides two words in an image, and expects a user to type them in a textfield"
+						"Recaptcha (http://recaptcha.net) provides two words in an image, "
+							. "and expects a user to type them in a textfield"
 					), 
 					"validation", 
 					false
