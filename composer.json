@@ -1,0 +1,16 @@
+{
+	"name": "silverstripe/recaptcha",
+	"description": "Provides a form field which allows form to validate for non-bot submissions by giving them a challenge to decrypt an image.",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "spamprotection"],
+	"authors": [
+		{
+			"name": "Ingo Schommer",
+			"email": "ingo@silverstripe.com"
+		}
+	],
+	"require": {
+		"silverstripe/spamprotection": "*",
+		"silverstripe/framework": "3.*"
+	}
+}
