@@ -12,14 +12,9 @@ by giving them a challenge to decrypt an image.
 
 ## Requirements
 
- * SilverStripe 3.0.0 or newer
+ * SilverStripe 3.0.0+
  * curl PHP module
  * Requires [SpamProtectionModule](http://silverstripe.org/spam-protection-module/)
-
-## Developer Documentation
-
- * http://doc.silverstripe.com/doku.php?id=modules:spamprotection
- * http://doc.silverstripe.com/doku.php?id=modules:recaptcha
 
 ## Installation
 
