@@ -1,5 +1,7 @@
 # Recaptcha FormField Module
 
+[![Build Status](https://secure.travis-ci.org/chillu/silverstripe-recaptcha.png)](http://travis-ci.org/chillu/silverstripe-recaptcha)
+
 ## Introduction
 
 Provides a FormField which allows form to validate for non-bot submissions
