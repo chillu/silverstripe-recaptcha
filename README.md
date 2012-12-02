@@ -54,6 +54,23 @@ Configuration example in `mysite/_config.php`
 
 Then once you have setup this config you will need to include the spam protector field as per the instructions on the [[modules:spamprotection|spamprotection module]] page.
 
+
+## Custom Theming
+
+The standard themes may be too limiting for your needs.
+
+Adding the following configuration to your _config.php file, will automatically set the field
+to use a customisable template:
+
+```php
+	RecaptchaField::$js_options = array(
+		'theme' => 'custom',
+		'custom_theme_widget' => 'recaptcha_widget'
+	);
+```
+
+You can edit the design template by creating your own `[themedir]/templates/CustomRecaptchaField.ss` file.
+
 ## Known issues:
 
 ### Problems with page doctype XHTML

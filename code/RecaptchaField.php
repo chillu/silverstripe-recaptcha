@@ -178,6 +178,9 @@ class RecaptchaField extends SpamProtectorField {
 				</script>
 			';
 		} else {
+			if(!empty($this->jsOptions) && isset($this->jsOptions['theme']) && $this->jsOptions['theme'] === 'custom'){
+				$html .= $this->renderWith("CustomRecaptchaField");
+			}
 			$html .= '
 				<script type="text/javascript" src="' . $jsURL . '">
 				</script>
@@ -191,7 +194,6 @@ class RecaptchaField extends SpamProtectorField {
 			<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
 			<input type="hidden" name="recaptcha_response_field" value="manual_challenge" />
 			</noscript>';
-	
 		return $html;
 	}
 	
