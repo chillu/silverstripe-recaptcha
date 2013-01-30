@@ -75,6 +75,20 @@ class RecaptchaField extends SpamProtectorField {
 	 * @var string
 	 */
 	public static $private_api_key = '';
+
+	/**
+	 * Your proxy server details including the port
+	 *
+	 * @var string
+	 */
+	public static $proxy_server = '';
+
+	/**
+	 * Your proxy server authentication
+	 *
+	 * @var string
+	 */
+	public static $proxy_auth = '';
 	
 	/**
 	 * Verify API server address (relative)
@@ -369,6 +383,10 @@ class RecaptchaField_HTTPClient extends Object {
 	 */
 	function post($url, $postVars) {
 		$ch = curl_init($url);
+		if(!empty(self::$proxy_server)){
+			curl_setopt($ch, CURLOPT_PROXY, self::$proxy_server);
+			curl_setopt($ch, CURLOPT_PROXYUSERPWD, self::$proxy_auth);
+		}
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'reCAPTCHA/PHP');
