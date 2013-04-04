@@ -1,6 +1,6 @@
 # Recaptcha FormField Module
 
-[![Build Status](https://secure.travis-ci.org/chillu/silverstripe-recaptcha.png?branch=0.1)](http://travis-ci.org/chillu/silverstripe-recaptcha)
+[![Build Status](https://travis-ci.org/chillu/silverstripe-recaptcha.png?branch=1.0)](https://travis-ci.org/chillu/silverstripe-recaptcha)
 
 
 ## Introduction
