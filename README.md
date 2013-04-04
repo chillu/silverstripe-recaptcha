@@ -28,6 +28,12 @@ This should go in your `mysite/_config.php`. You can get an free API key at [htt
 	RecaptchaField::$public_api_key = '<publickey>';
 	RecaptchaField::$private_api_key = '<privatekey>';
 
+	If using on a site requiring a proxy server for outgoing traffic then you can set these additional
+	options in your `mysite/_config.php`. 
+
+	RecaptchaField::$proxy_server = "<proxy address>";
+	RecaptchaField::$proxy_auth = "<proxy_username>:<proxy_password>";
+
 ## Usage
 
 ### As a Standalone Field
