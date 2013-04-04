@@ -1,5 +1,8 @@
 # Recaptcha FormField Module
 
+[![Build Status](https://secure.travis-ci.org/chillu/silverstripe-recaptcha.png?branch=0.1)](http://travis-ci.org/chillu/silverstripe-recaptcha)
+
+
 ## Introduction
 
 Provides a FormField which allows form to validate for non-bot submissions
@@ -12,7 +15,7 @@ by giving them a challenge to decrypt an image.
 
 ## Requirements
 
- * SilverStripe 2.3 or newer
+ * SilverStripe 2.4 or newer
  * curl PHP module
  * Requires [SpamProtectionModule](http://silverstripe.org/spam-protection-module/)
 
