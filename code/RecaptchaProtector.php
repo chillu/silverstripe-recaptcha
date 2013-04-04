@@ -16,7 +16,9 @@ class RecaptchaProtector implements SpamProtector {
 	function getFormField($name = "RecaptchaField", $title = "Captcha", 
 		$value = null, $form = null, $rightTitle = null
 	) {
-		return new RecaptchaField($name, $title, $value, $form, $rightTitle);
+		$field = new RecaptchaField($name, $title, $value, $form, $rightTitle);
+		$field->useSSL = Director::protocol() == 'https://';
+		return $field;
 	}
 	
 	/**
