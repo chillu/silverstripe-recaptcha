@@ -393,7 +393,7 @@ class RecaptchaField_HTTPClient extends Object {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'reCAPTCHA/PHP');
 		// we need application/x-www-form-urlencoded
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postVars)); 
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postVars, "", "&")); 
 		$response = curl_exec($ch);
 
 		if(class_exists('SS_HTTPResponse')) {
