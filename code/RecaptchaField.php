@@ -385,10 +385,13 @@ class RecaptchaField_HTTPClient extends Object {
 	 */
 	function post($url, $postVars) {
 		$ch = curl_init($url);
-		if(!empty(self::$proxy_server)){
-			curl_setopt($ch, CURLOPT_PROXY, self::$proxy_server);
-			curl_setopt($ch, CURLOPT_PROXYUSERPWD, self::$proxy_auth);
+		if(!empty(RecaptchaField::$proxy_server)){
+			curl_setopt($ch, CURLOPT_PROXY, RecaptchaField::$proxy_server);
+			if (!empty(RecaptchaField::$proxy_auth)){
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, RecaptchaField::$proxy_auth);
+			}
 		}
+
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'reCAPTCHA/PHP');
