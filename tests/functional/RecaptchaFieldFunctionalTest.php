@@ -54,7 +54,11 @@ class RecaptchaFieldFunctionalTest extends FunctionalTest {
 }
 
 class RecaptchaFieldFunctionalTest_Controller extends Controller implements TestOnly {
-	
+
+	private static $allowed_actions = array(
+		'Form'
+	);
+
 	protected $template = 'BlankPage';
 	
 	function Link($action = null) {
