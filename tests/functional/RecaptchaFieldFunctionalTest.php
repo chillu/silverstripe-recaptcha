@@ -6,7 +6,7 @@
 /**
  * @author Ingo Schommer, SilverStripe Ltd.
  */
-class RecatpchaFieldFunctionalTest extends FunctionalTest {
+class RecaptchaFieldFunctionalTest extends FunctionalTest {
 	
 	protected $orig = array();
 	
@@ -27,7 +27,7 @@ class RecatpchaFieldFunctionalTest extends FunctionalTest {
 	}
 	
 	function testValidSubmission() {
-		$this->get('RecatpchaFieldFunctionalTest_Controller');
+		$this->get('RecaptchaFieldFunctionalTest_Controller');
 		$data = array(
 			'recaptcha_challenge_field' => 'valid',
 			'recaptcha_response_field' => 'response'
@@ -37,7 +37,7 @@ class RecatpchaFieldFunctionalTest extends FunctionalTest {
 	}
 	
 	function testInvalidSubmission() {
-		$this->get('RecatpchaFieldFunctionalTest_Controller');
+		$this->get('RecaptchaFieldFunctionalTest_Controller');
 		$data = array(
 			'recaptcha_challenge_field' => 'invalid',
 			'recaptcha_response_field' => 'response'
@@ -53,12 +53,12 @@ class RecatpchaFieldFunctionalTest extends FunctionalTest {
 	
 }
 
-class RecatpchaFieldFunctionalTest_Controller extends Controller implements TestOnly {
+class RecaptchaFieldFunctionalTest_Controller extends Controller implements TestOnly {
 	
 	protected $template = 'BlankPage';
 	
 	function Link($action = null) {
-		return Controller::join_links('RecatpchaFieldFunctionalTest_Controller', $action);
+		return Controller::join_links('RecaptchaFieldFunctionalTest_Controller', $action);
 	}
 	
 	function Form() {
@@ -72,7 +72,7 @@ class RecatpchaFieldFunctionalTest_Controller extends Controller implements Test
 				new FormAction('doSubmit', 'submit')
 			)
 		);
-		$f->setHTTPClient(new RecatpchaFieldTest_HTTPClient());
+		$f->setHTTPClient(new RecaptchaFieldTest_HTTPClient());
 		
 		return $form;
 	}
