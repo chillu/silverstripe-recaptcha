@@ -3,12 +3,12 @@
  * @package recaptcha
  */
 
-class RecatpchaFieldTest extends SapphireTest {
+class RecaptchaFieldTest extends SapphireTest {
 	
 	function testValidate() {
 		$form = new Form(new Controller(), 'Form', new FieldList(), new FieldList());
 		$f = new RecaptchaField('MyField');
-		$f->setHTTPClient(new RecatpchaFieldTest_HTTPClient());
+		$f->setHTTPClient(new RecaptchaFieldTest_HTTPClient());
 		$f->setForm($form);
 		$v = new RequiredFields();
 		
@@ -25,7 +25,7 @@ class RecatpchaFieldTest extends SapphireTest {
 	}
 }
 
-class RecatpchaFieldTest_HTTPClient extends RecaptchaField_HTTPClient implements TestOnly {
+class RecaptchaFieldTest_HTTPClient extends RecaptchaField_HTTPClient implements TestOnly {
 	function post($url, $postVars) {
 		if($postVars['challenge'] == 'valid') {
 			return new SS_HTTPResponse("true\nNo errors");
