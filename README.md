@@ -14,7 +14,7 @@ by giving them a challenge to decrypt an image.
 
 ## Requirements
 
- * SilverStripe framework 3.0.0+ (or SilverStripe 2.3/2.4 for 1.0.0 version)
+ * SilverStripe framework 3.1 or newer
  * curl PHP module
  * Requires [spamprotection](http://silverstripe.org/spam-protection-module/) module
 
