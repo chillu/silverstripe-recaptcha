@@ -11,6 +11,6 @@
 	],
 	"require": {
 		"silverstripe/spamprotection": "*",
-		"silverstripe/framework": "3.*"
+		"silverstripe/framework": "3.0"
 	}
 }
