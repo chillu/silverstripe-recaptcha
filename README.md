@@ -16,7 +16,7 @@ by giving them a challenge to decrypt an image.
 
  * SilverStripe framework 3.0.0+ (or SilverStripe 2.3/2.4 for 1.0.0 version)
  * curl PHP module
- * Requires [SpamProtectionModule](http://silverstripe.org/spam-protection-module/)
+ * Requires [spamprotection](http://silverstripe.org/spam-protection-module/) module
 
 ## Installation
 
@@ -45,15 +45,15 @@ If you want to use Recaptcha field by itself, you can simply just include it as 
 	
 See [Recaptcha API docs](https://developers.google.com/recaptcha/intro) for more configuration options.
 
-### Integration with Spamprotection module
+### Integration with spamprotection module
 
-This requires the [[:modules:spamprotection|spamprotection module]] to be installed, see its documentation for details. You can use this field to protect any built informs on your website, including user comments in the [[:modules:blog]] module. 
+This requires the [spamprotection](https://github.com/silverstripe/silverstripe-spamprotection) module to be installed, see its documentation for details. You can use this field to protect any built informs on your website, including user comments in the [[:modules:blog]] module. 
 
 Configuration example in `mysite/_config.php`
 
 	SpamProtectorManager::set_spam_protector('RecaptchaProtector');
 
-Then once you have setup this config you will need to include the spam protector field as per the instructions on the [[modules:spamprotection|spamprotection module]] page.
+Then once you have setup this config you will need to include the spam protector field as per the instructions on the [spamprotection](https://github.com/silverstripe/silverstripe-spamprotection) page.
 
 
 ## Custom Theming
