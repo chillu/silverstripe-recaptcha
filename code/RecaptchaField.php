@@ -182,16 +182,14 @@ class RecaptchaField extends SpamProtectorField {
 			$ajaxURL = ($this->useSSL) ? 'https://' : 'http://';
 			$ajaxURL .= self::$recaptcha_ajax_url;
 			Requirements::javascript($ajaxURL);
-			$html .= '
-				<script type="text/javascript">
+			Requirements::customScript('
 					//<![CDATA[
 					Recaptcha.create("' . self::$public_api_key . '",
 					"' . $this->getName() . '", {
 					   callback: Recaptcha.focus_response_field
 					});
 				//]]>
-				</script>
-			';
+			');
 		} else {
 			if(!empty($this->jsOptions) && isset($this->jsOptions['theme']) && $this->jsOptions['theme'] === 'custom'){
 				$html .= $this->renderWith("CustomRecaptchaField");
