@@ -49,9 +49,14 @@ See [Recaptcha API docs](https://developers.google.com/recaptcha/intro) for more
 
 This requires the [spamprotection](https://github.com/silverstripe/silverstripe-spamprotection) module to be installed, see its documentation for details. You can use this field to protect any built informs on your website, including user comments in the [[:modules:blog]] module. 
 
-Configuration example in `mysite/_config.php`
+Configuration example in `mysite/_config/spamprotection.yml`
 
-	SpamProtectorManager::set_spam_protector('RecaptchaProtector');
+	---
+	name: spamprotection
+	---
+	FormSpamProtectionExtension:
+	  default_spam_protector: RecaptchaProtector
+  
 
 Then once you have setup this config you will need to include the spam protector field as per the instructions on the [spamprotection](https://github.com/silverstripe/silverstripe-spamprotection) page.
 

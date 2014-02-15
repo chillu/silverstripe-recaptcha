@@ -22,7 +22,7 @@
  * @see http://recaptcha.net
  * @see http://recaptcha.net/api/getkey
  */
-class RecaptchaField extends SpamProtectorField {
+class RecaptchaField extends FormField {
 	
 	/**
 	 * Use secure connection for API-calls
