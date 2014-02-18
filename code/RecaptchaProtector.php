@@ -19,4 +19,10 @@ class RecaptchaProtector implements SpamProtector {
 
 		return $field;
 	}
+
+	/**
+	 * Not used by Recaptcha
+	 */
+	public function setFieldMapping($fieldMapping) {}
+
 }
