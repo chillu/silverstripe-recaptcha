@@ -9,126 +9,126 @@
  * Generation and validation of captchas is handled on external server.
  * This field doesn't save anything back to the form,
  * and only submits recaptcha-related form-data to an external server.
- * 
+ *
  * Your site language can be auto-detected for a number of available
  * languages. see http://doc.silverstripe.com/doku.php?id=i18n:
  * <example>
  * i18n::set_locale('de_DE');
  * </example>
- * 
- * @todo Does NOT work when the form is submitted via ajax, 
+ *
+ * @todo Does NOT work when the form is submitted via ajax,
  * see http://recaptcha.net/apidocs/captcha/client.html for details on implementation.
- * 
+ *
  * @see http://recaptcha.net
  * @see http://recaptcha.net/api/getkey
  */
 class RecaptchaField extends FormField {
-	
+
 	/**
 	 * Use secure connection for API-calls
 	 *
 	 * @var boolean
 	 */
-	public $useSSL = false;
-	
+	private static $use_ssl = false;
+
 	/**
 	 * Javasript-object formatted as a string,
 	 * which can contain options about the used theme/language etc.
 	 * <example>
 	 * "array('theme' => 'white')
 	 * </example>
-	 * 
-	 * @see http://recaptcha.net/apidocs/captcha/client.html
-	 * @var array
-	 */
-	public $jsOptions = array();
-	
-	/**
-	 * Javasript-object formatted as a string,
-	 * which can contain options about the used theme/language etc.
-	 * <example>
-	 * "array('theme' => 'white')
-	 * </example>
-	 * 
+	 *
 	 * This is similar to {@link $jsOptions}, but sets the default values used by all RecaptchaFields.
 	 */
-	public static $js_options = array();
-	
-	/**
-	 * Use Ajax instead of iframe inclusion.
-	 * 
-	 * @see http://recaptcha.net/apidocs/captcha/client.html
-	 * @var boolean
-	 */
-	public $useAjaxAPI = false;
-	
+	private static $js_options = array();
+
 	/**
 	 * Your public API key for a specific domain (get one at http://recaptcha.net/api/getkey)
 	 *
 	 * @var string
 	 */
-	public static $public_api_key = '';
-	
+	private static $public_api_key = '';
+
 	/**
 	 * Your private API key for a specific domain (get one at http://recaptcha.net/api/getkey)
 	 *
 	 * @var string
 	 */
-	public static $private_api_key = '';
+	private static $private_api_key = '';
 
 	/**
 	 * Your proxy server details including the port
 	 *
 	 * @var string
 	 */
-	public static $proxy_server = '';
+	private static $proxy_server = '';
 
 	/**
 	 * Your proxy server authentication
 	 *
 	 * @var string
 	 */
-	public static $proxy_auth = '';
-	
+	private static $proxy_auth = '';
+
 	/**
 	 * Verify API server address (relative)
 	 *
 	 * @var string
 	 */
-	public static $api_verify_server = 'www.google.com/recaptcha/api/verify';
-	
+	private static $api_verify_server = 'www.google.com/recaptcha/api/verify';
+
 	/**
 	 * Javascript-address which includes necessary logic from the recaptcha-server.
 	 * Your public key is automatically inserted.
-	 * 
+	 *
 	 * @var string
 	 */
-	public static $recaptcha_js_url = "www.google.com/recaptcha/api/challenge?k=%s";
-	
+	private static $recaptcha_js_url = "www.google.com/recaptcha/api/challenge?k=%s";
+
 	/**
 	 * URL to use when {@link $useAjaxAPI} is true.
 	 *
 	 * @var string
 	 */
-	public static $recaptcha_ajax_url = "www.google.com/recaptcha/api/js/recaptcha_ajax.js";
-	
+	private static $recaptcha_ajax_url = "www.google.com/recaptcha/api/js/recaptcha_ajax.js";
+
 	/**
 	 * @var string
 	 */
-	public static $recaptcha_noscript_url = "www.google.com/recaptcha/api/noscript?k=%s";
-	
+	private static $recaptcha_noscript_url = "www.google.com/recaptcha/api/noscript?k=%s";
+
 	/**
 	 * @var string
 	 */
-	public static $httpclient_class = 'RecaptchaField_HTTPClient';
-	
+	private static $httpclient_class = 'RecaptchaField_HTTPClient';
+
+	/**
+	 * Javasript-object formatted as a string,
+	 * which can contain options about the used theme/language etc.
+	 * <example>
+	 * "array('theme' => 'white')
+	 * </example>
+	 *
+	 * @see http://recaptcha.net/apidocs/captcha/client.html
+	 * @var array
+	 */
+	public $jsOptions = array();
+
+	/**
+	 * Use Ajax instead of iframe inclusion.
+	 *
+	 * @see http://recaptcha.net/apidocs/captcha/client.html
+	 * @var boolean
+	 */
+	public $useAjaxAPI = false;
+
 	/**
 	 * All languages in which the recaptcha widget is available.
 	 *
 	 * @see http://recaptcha.net/apidocs/captcha/client.html
 	 * @var array
 	 */
-	protected static $valid_languages = array(
+	private static $valid_languages = array(
 		'en',
 		'nl',
 		'fr',
@@ -136,26 +136,28 @@ class RecaptchaField extends FormField {
 		'pt',
 		'ru',
 		'es',
-		'tr',
+		'tr'
 	);
-	
+
 	function __construct($name, $title = null, $value = null) {
 		parent::__construct($name, $title, $value);
-		
-		$this->jsOptions = self::$js_options;
-		
+
+		$this->jsOptions = Config::inst()->get("RecaptchaField", "js_options");
+
 		// try to auto-detect language-settings
 		$lang = substr(i18n::get_locale(), 0, 2);
-		if(in_array($lang, self::$valid_languages)) $this->jsOptions['lang'] = $lang;
+		if(in_array($lang, Config::inst()->get("RecaptchaField", "valid_languages"))) {
+			$this->jsOptions['lang'] = $lang;
+		}
 	}
-	
+
 	public function Field($properties=array()) {
-		if(empty(self::$public_api_key) || empty(self::$private_api_key)) {
+		if(empty(Config::inst()->get("RecaptchaField", "public_api_key")) || empty(Config::inst()->get("RecaptchaField", "private_api_key"))) {
 			user_error('RecaptchaField::FieldHolder() Please specify valid Recaptcha Keys', E_USER_ERROR);
 		}
 
 		$html = '';
-		
+
 		// Add javascript options as a <script> tag preceeding the JS that actually includes the
 		// recaptcha
 		if(!empty($this->jsOptions)) {
@@ -168,26 +170,29 @@ class RecaptchaField extends FormField {
 		Session::clear("FormField.{$this->form->FormName()}.{$this->getName()}.error");
 
 		// iframe (fallback)
-		$iframeURL = ($this->useSSL) ? 'https://' : 'http://';
-		$iframeURL .= sprintf(self::$recaptcha_noscript_url, self::$public_api_key);
+		$iframeURL = (Config::inst()->get("RecaptchaField", "use_ssl")) ? 'https://' : 'http://';
+		$iframeURL .= sprintf(Config::inst()->get("RecaptchaField", "recaptcha_noscript_url"), Config::inst()->get("RecaptchaField", "public_api_key"));
 		if(!empty($previousError)) $iframeURL .= "&error={$previousError}";
-		
+
 		// js (main logic)
 		$jsURL = ($this->useSSL) ? 'https://' : 'http://';
-		$jsURL .= sprintf(self::$recaptcha_js_url, self::$public_api_key);
+		$jsURL .= sprintf(Config::inst()->get("RecaptchaField", "recaptcha_js_url"), Config::inst()->get("RecaptchaField", "public_api_key"));
 		if(!empty($previousError)) $jsURL .= "&error={$previousError}";
-	
-		
+
+
 		if($this->useAjaxAPI) {
-			$ajaxURL = ($this->useSSL) ? 'https://' : 'http://';
-			$ajaxURL .= self::$recaptcha_ajax_url;
+			$ajaxURL = (Config::inst()->get("RecaptchaField", "use_ssl")) ? 'https://' : 'http://';
+			$ajaxURL .= Config::inst()->get("RecaptchaField", "recaptcha_ajax_url");
 			Requirements::javascript($ajaxURL);
 			Requirements::customScript('
 					//<![CDATA[
-					Recaptcha.create("' . self::$public_api_key . '",
-					"' . $this->getName() . '", {
-					   callback: Recaptcha.focus_response_field
-					});
+					Recaptcha.create(
+						"' . Config::inst()->get("RecaptchaField", "public_api_key"). '",
+						"' . $this->getName() . '",
+						{
+							callback: Recaptcha.focus_response_field
+						}
+					);
 				//]]>
 			');
 		} else {
@@ -199,7 +204,7 @@ class RecaptchaField extends FormField {
 				</script>
 			';
 		}
-		
+
 		// noscript fallback
 		$html .= '<noscript>
 			<iframe src="' .$iframeURL . '" height="300" width="500"></iframe>
@@ -209,7 +214,7 @@ class RecaptchaField extends FormField {
 			</noscript>';
 		return $html;
 	}
-	
+
 	function FieldHolder($properties=array()) {
 		$Title = $this->XML_val('Title');
 		$Message = $this->XML_val('Message');
@@ -218,18 +223,18 @@ class RecaptchaField extends FormField {
 		$extraClass = $this->XML_val('extraClass');
 		$Name = $this->XML_val('Name');
 		$Field = $this->XML_val('Field');
-		
+
 		$messageBlock = (!empty($Message)) ? "<span class=\"message $MessageType\">$Message</span>" : "";
 
 		return <<<HTML
 <div id="$Name" class="field $Type $extraClass">{$Field}{$messageBlock}</div>
 HTML;
 	}
-	
+
 	/**
 	 * Transform options from PHP-array to javascript-object encapsulated
 	 * in a string.
-	 * 
+	 *
 	 * @todo switch to json_encode once we move requirements to PHP 5.2+
 	 * @return string
 	 */
@@ -245,7 +250,7 @@ HTML;
 
 		return $js;
 	}
-	
+
 	/**
 	 * Validate by submitting to external service
 	 *
@@ -256,46 +261,46 @@ HTML;
 	public function validate($validator) {
 		// don't bother querying the recaptcha-service if fields were empty
 		if(
-			!isset($_REQUEST['recaptcha_challenge_field']) 
+			!isset($_REQUEST['recaptcha_challenge_field'])
 			|| empty($_REQUEST['recaptcha_challenge_field'])
-			|| !isset($_REQUEST['recaptcha_response_field']) 
+			|| !isset($_REQUEST['recaptcha_response_field'])
 			|| empty($_REQUEST['recaptcha_response_field'])
 		) {
 			$validator->validationError(
-				$this->name, 
+				$this->name,
 				_t(
-					'RecaptchaField.EMPTY', 
+					'RecaptchaField.EMPTY',
 					"Please answer the captcha question",
 					"Recaptcha (http://recaptcha.net) provides two words in an image, "
 						. "and expects a user to type them in a textfield"
-				), 
-				"validation", 
+				),
+				"validation",
 				false
 			);
-			
+
 			return false;
 		}
 
 		$response = $this->recaptchaHTTPPost(
-			$_REQUEST['recaptcha_challenge_field'], 
+			$_REQUEST['recaptcha_challenge_field'],
 			$_REQUEST['recaptcha_response_field']
 		);
 
 		if(!$response) {
 			$validator->validationError(
-				$this->name, 
+				$this->name,
 				_t(
 					'RecaptchaField.NORESPONSE',
 					"The recaptcha service gave no response. Please try again later.",
 					"Recaptcha (http://recaptcha.net) provides two words in an image, "
 						. "and expects a user to type them in a textfield"
-				), 
-				"validation", 
+				),
+				"validation",
 				false
 			);
-			return false;			
+			return false;
 		}
-		
+
 		// get the payload of the response and split it by newlines
 		list($isValid, $error) = explode("\n", $response, 2);
 
@@ -306,30 +311,30 @@ HTML;
 				user_error("RecatpchaField::validate(): Recaptcha-service error: '{$error}'", E_USER_ERROR);
 				return false;
 			} else {
-				// Internal error-string returned by recaptcha, e.g. "incorrect-captcha-sol". 
+				// Internal error-string returned by recaptcha, e.g. "incorrect-captcha-sol".
 				// Used to generate the new iframe-url/js-url after form-refresh.
-				Session::set("FormField.{$this->form->FormName()}.{$this->getName()}.error", trim($error)); 
+				Session::set("FormField.{$this->form->FormName()}.{$this->getName()}.error", trim($error));
 				$validator->validationError(
-					$this->name, 
+					$this->name,
 					_t(
-						'RecaptchaField.VALIDSOLUTION', 
+						'RecaptchaField.VALIDSOLUTION',
 						"Your answer didn't match the captcha words, please try again",
 						"Recaptcha (http://recaptcha.net) provides two words in an image, "
 							. "and expects a user to type them in a textfield"
-					), 
-					"validation", 
+					),
+					"validation",
 					false
 				);
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Fires off a HTTP-POST request
-	 * 
+	 *
 	 * @see Based on http://recaptcha.net/plugins/php/
 	 * @param string $challengeStr
 	 * @param string $responseStr
@@ -337,19 +342,19 @@ HTML;
 	 */
 	protected function recaptchaHTTPPost($challengeStr, $responseStr) {
 		$postVars = array(
-			'privatekey' => self::$private_api_key,
+			'privatekey' =>  Config::inst()->get("RecaptchaField", "private_api_key"),
 			'remoteip' => $_SERVER["REMOTE_ADDR"],
 			'challenge' => $challengeStr,
 			'response' => $responseStr,
 		);
 		$client = $this->getHTTPClient();
-		$url = ($this->useSSL) ? 'https://' : 'http://';
-		$url .= self::$api_verify_server;
+		$url = (Config::inst()->get("RecaptchaField", "use_ssl")) ? 'https://' : 'http://';
+		$url .= Config::inst()->get("RecaptchaField", "api_verify_server");
 		$response = $client->post($url, $postVars);
 
 		return $response->getBody();
 	}
-	
+
 	/**
 	 * @param RecaptchaField_HTTPClient
 	 */
@@ -357,16 +362,16 @@ HTML;
 		$this->client = $client;
 		return $this;
 	}
-	
+
 	/**
 	 * @return RecaptchaField_HTTPClient
 	 */
 	function getHTTPClient() {
 		if(!$this->client) {
-			$class = self::$httpclient_class;
+			$class = Config::inst()->get("RecaptchaField", "httpclient_class");
 			$this->client = new $class();
 		}
-		
+
 		return $this->client;
 	}
 }
@@ -375,7 +380,7 @@ HTML;
  * Simple HTTP client, mainly to make it mockable.
  */
 class RecaptchaField_HTTPClient extends Object {
-	
+
 	/**
 	 * @param String $url
 	 * @param Array $data
@@ -383,10 +388,12 @@ class RecaptchaField_HTTPClient extends Object {
 	 */
 	function post($url, $postVars) {
 		$ch = curl_init($url);
-		if(!empty(RecaptchaField::$proxy_server)){
-			curl_setopt($ch, CURLOPT_PROXY, RecaptchaField::$proxy_server);
+		$proxyServer = Config::inst()->get("RecaptchaField", "proxy_server");
+		if(!empty($proxyServer)){
+			curl_setopt($ch, CURLOPT_PROXY, $proxyServer);
 			if (!empty(RecaptchaField::$proxy_auth)){
-				curl_setopt($ch, CURLOPT_PROXYUSERPWD, RecaptchaField::$proxy_auth);
+				$proxyAuth = Config::inst()->get("RecaptchaField", "proxy_auth");
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyAuth);
 			}
 		}
 
@@ -394,7 +401,7 @@ class RecaptchaField_HTTPClient extends Object {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'reCAPTCHA/PHP');
 		// we need application/x-www-form-urlencoded
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postVars)); 
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postVars));
 		$response = curl_exec($ch);
 
 		if(class_exists('SS_HTTPResponse')) {
@@ -404,7 +411,7 @@ class RecaptchaField_HTTPClient extends Object {
 			$responseObj = new HTTPResponse();
 		}
 		$responseObj->setBody($response); // 2.2. compat
-		
+
 		return $responseObj;
 	}
 }
