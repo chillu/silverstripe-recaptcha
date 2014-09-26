@@ -68,6 +68,13 @@ class RecaptchaField extends FormField {
 	 * @var string
 	 */
 	public static $public_api_key = '';
+
+	/**
+	 *  A fake code that can be used to bypass  validation using recaptcha used for testing
+	 *
+	 * @var string
+	 */
+	public static $fakeCode = "";
 	
 	/**
 	 * Your private API key for a specific domain (get one at http://recaptcha.net/api/getkey)
@@ -254,6 +261,11 @@ HTML;
 	 * @return boolean
 	 */
 	public function validate($validator) {
+		// if code parameter is defined, then just valid without submitting to the service.
+		if(!empty(self::$fakeCode)){
+			return $_REQUEST['recaptcha_response_field'] === self::$fakeCode;
+		}
+
 		// don't bother querying the recaptcha-service if fields were empty
 		if(
 			!isset($_REQUEST['recaptcha_challenge_field']) 
