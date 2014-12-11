@@ -210,22 +210,6 @@ class RecaptchaField extends FormField {
 		return $html;
 	}
 	
-	function FieldHolder($properties=array()) {
-		$Title = $this->XML_val('Title');
-		$Message = $this->XML_val('Message');
-		$MessageType = $this->XML_val('MessageType');
-		$Type = $this->XML_val('Type');
-		$extraClass = $this->XML_val('extraClass');
-		$Name = $this->XML_val('Name');
-		$Field = $this->XML_val('Field');
-		
-		$messageBlock = (!empty($Message)) ? "<span class=\"message $MessageType\">$Message</span>" : "";
-
-		return <<<HTML
-<div id="$Name" class="field $Type $extraClass">{$Field}{$messageBlock}</div>
-HTML;
-	}
-	
 	/**
 	 * Transform options from PHP-array to javascript-object encapsulated
 	 * in a string.
