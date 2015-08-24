@@ -103,14 +103,14 @@ class RecaptchaField extends FormField {
 		if(!empty($previousError)) $jsURL .= "&error={$previousError}";
 
 		// turn options array into data attributes
-		$option_string = '';
+		$optionString = '';
 		foreach($this->options as $option => $value) {
-			$option_string .= ' data-' . htmlentities($option) . '="' . htmlentities($value) . '"';
+			$optionString .= ' data-' . htmlentities($option) . '="' . htmlentities($value) . '"';
 		}
 	
 		Requirements::javascript($jsURL);
 		$html .= '<div class="g-recaptcha" id="' . $this->getName() . '"
-			data-sitekey="' . self::$public_api_key . '"' . $option_string . '></div>';
+			data-sitekey="' . self::$public_api_key . '"' . $optionString . '></div>';
 		
 		// noscript fallback
 		$html .= <<<EOF
