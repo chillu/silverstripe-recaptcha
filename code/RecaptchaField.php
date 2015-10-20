@@ -82,6 +82,11 @@ class RecaptchaField extends FormField {
 	
 	function __construct($name, $title = null, $value = null) {
 		parent::__construct($name, $title, $value);
+		
+		// do not need a fallback title if none was defined.
+		if (empty($title)) {
+			$this->title = '';
+		}
 	}
 	
 	public function Field($properties=array()) {
