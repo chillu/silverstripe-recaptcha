@@ -1,17 +1,21 @@
 # See https://github.com/silverstripe-labs/silverstripe-travis-support for setup details
 
 language: php 
-php: 
- - 5.3
-
-env:
- - DB=MYSQL CORE_RELEASE=3.1
- - DB=PGSQL CORE_RELEASE=master
 
 matrix:
   include:
+    - php: 5.3
+      env: DB=MYSQL CORE_RELEASE=3.1
     - php: 5.4
-      env: DB=MYSQL CORE_RELEASE=master
+      env: DB=MYSQL CORE_RELEASE=3.2
+    - php: 5.5
+      env: DB=MYSQL CORE_RELEASE=3.3
+    - php: 5.6
+      env: DB=MYSQL CORE_RELEASE=3
+    - php: 5.6
+      env: DB=MYSQL CORE_RELEASE=3.1 SECUREASSETS=1
+    - php: 5.6
+      env: DB=PGSQL CORE_RELEASE=3.3
 
 before_script:
  - pear -q install --onlyreqdeps pear/PHP_CodeSniffer
@@ -22,4 +26,3 @@ before_script:
 
 script: 
  - phpunit recaptcha/tests/
- - phpcs --encoding=utf-8 --tab-width=4 --standard=framework/tests/phpcs -np recaptcha
