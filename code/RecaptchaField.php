@@ -38,35 +38,35 @@ class RecaptchaField extends FormField
      *
      * @var string
      */
-    public static $public_api_key = '';
+    private static $public_api_key = '';
 
     /**
      * Your private API key for a specific domain (get one at https://www.google.com/recaptcha/admin)
      *
      * @var string
      */
-    public static $private_api_key = '';
+    private static $private_api_key = '';
 
     /**
      * Your proxy server details including the port
      *
      * @var string
      */
-    public static $proxy_server = '';
+    private static $proxy_server = '';
 
     /**
      * Your proxy server authentication
      *
      * @var string
      */
-    public static $proxy_auth = '';
+    private static $proxy_auth = '';
 
     /**
      * Verify API server address (relative)
      *
      * @var string
      */
-    public static $api_verify_server = 'https://www.google.com/recaptcha/api/siteverify';
+    private static $api_verify_server = 'https://www.google.com/recaptcha/api/siteverify';
 
     /**
      * Javascript-address which includes necessary logic from the recaptcha-server.
@@ -74,17 +74,23 @@ class RecaptchaField extends FormField
      *
      * @var string
      */
-    public static $recaptcha_js_url = 'https://www.google.com/recaptcha/api.js';
+    private static $recaptcha_js_url = 'https://www.google.com/recaptcha/api.js';
 
     /**
      * @var string
      */
-    public static $recaptcha_noscript_url = 'https://www.google.com/recaptcha/api/fallback?k=%s';
+    private static $recaptcha_noscript_url = 'https://www.google.com/recaptcha/api/fallback?k=%s';
+
+    /**
+     * Default the noscript option to false
+     * @var bool
+     */
+    private static $noscript_enabled = false;
 
     /**
      * @var string
      */
-    public static $httpclient_class = 'RecaptchaField_HTTPClient';
+    private static $httpclient_class = 'RecaptchaField_HTTPClient';
 
     public function __construct($name, $title = null, $value = null)
     {
@@ -104,15 +110,8 @@ class RecaptchaField extends FormField
             user_error('RecaptchaField::FieldHolder() Please specify valid Recaptcha Keys', E_USER_ERROR);
         }
 
-        $html = '';
-
         $previousError = Session::get("FormField.{$this->form->FormName()}.{$this->getName()}.error");
         Session::clear("FormField.{$this->form->FormName()}.{$this->getName()}.error");
-
-        $recaptchaNoscriptUrl = self::config()->get('recaptcha_noscript_url');
-        // iframe (fallback)
-        $iframeURL = sprintf($recaptchaNoscriptUrl, $publicKey);
-        if (!empty($previousError)) $iframeURL .= "&error={$previousError}";
 
         $recaptchaJsUrl = self::config()->get('recaptcha_js_url');
         // js (main logic)
@@ -123,40 +122,30 @@ class RecaptchaField extends FormField
 
         // turn options array into data attributes
         $optionString = '';
-        foreach ($this->options as $option => $value) {
+        $config = self::config()->get('options') ?: array();
+        foreach ($config as $option => $value) {
             $optionString .= ' data-' . htmlentities($option) . '="' . htmlentities($value) . '"';
         }
 
         Requirements::javascript($jsURL);
-        $html .= '<div class="g-recaptcha" id="' . $this->getName() . '"
-			data-sitekey="' . $publicKey . '"' . $optionString . '></div>';
-
-        // noscript fallback
-        $html .= <<<EOF
-<noscript>
-  <div style="width: 302px; height: 462px;">
-    <div style="width: 302px; height: 422px; position: relative;">
-      <div style="width: 302px; height: 422px; position: absolute;">
-        <iframe src="{$iframeURL}"
-                frameborder="0" scrolling="no"
-                style="width: 302px; height:422px; border-style: none;">
-        </iframe>
-      </div>
-    </div>
-    <div style="border-style: none; bottom: 12px; left: 25px; margin: 0px; padding: 0px;
-                right: 25px; background: #f9f9f9; border: 1px solid #c1c1c1;
-                border-radius: 3px; height: 60px; width: 300px;">
-      <textarea id="g-recaptcha-response" name="g-recaptcha-response"
-                class="g-recaptcha-response"
-                style="width: 250px; height: 40px; border: 1px solid #c1c1c1;
-                margin: 10px 25px; padding: 0px; resize: none;">
-      </textarea>
-    </div>
-  </div>
-  <br>
-</noscript>
-EOF;
-
+        $fieldData = ArrayData::create(
+            array(
+                'public_api_key' => self::config()->get('public_api_key'),
+                'name'           => $this->getName(),
+                'options'        => $optionString
+            )
+        );
+        $html = $fieldData->renderWith('recaptcha');
+        if (self::config()->get('noscript_enabled')) {
+            // noscript fallback
+            $noscriptData = ArrayData::create(
+                array(
+                    'public_api_key' => self::config()->get('public_api_key')
+                )
+            );
+            $resultHTML = $noscriptData->renderWith('recaptcha_noscript');
+            $html .= $resultHTML;
+        }
         return $html;
     }
 
@@ -314,7 +303,7 @@ class RecaptchaField_HTTPClient extends Object
             $responseObj = new HttpResponse();
         }
         $responseObj->setBody($response); // 2.2. compat
-
+        $responseObj->addHeader('Content-Type', 'application/json');
         return $responseObj;
     }
 }

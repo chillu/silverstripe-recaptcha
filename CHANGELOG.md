@@ -14,3 +14,10 @@
 - Using curl for HTTP communication
 - Fixed timeout problems
 - Added basic unit tests
+
+# 0.5 (2016-10-10)
+- Use YML configuration (e.g. `Recaptcha.api_verify_server`) instead of `$js_options` class static
+- Removed `$useSSL` option (now always on SSL)
+- Removed `$valid_languages`, use `hl` parameter in the options (see https://developers.google.com/recaptcha/docs/display)
+- Removed `$useAjaxAPI` (Recaptcha v2 works differently now)
+- `<noscript>` fallback requires additional configuration now (https://developers.google.com/recaptcha/docs/faq)

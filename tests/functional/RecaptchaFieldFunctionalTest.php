@@ -19,6 +19,7 @@ class RecaptchaFieldFunctionalTest extends FunctionalTest
         $this->orig['private_api_key'] = Config::inst()->get('RecaptchaField', 'private_api_key');
         Config::inst()->update('RecaptchaField', 'public_api_key', 'test');
         Config::inst()->update('RecaptchaField', 'private_api_key', 'test');
+        Config::inst()->update('RecaptchaField', 'noscript_enabled', true);
     }
 
     public function tearDown()
@@ -47,7 +48,7 @@ class RecaptchaFieldFunctionalTest extends FunctionalTest
         );
         $response = $this->submitForm('Form_Form', null, $data);
         $body = $response->getBody();
-        $this->assertContains('Your answer didn&#039;t match', $body);
+        $this->assertContains('Your answer didn&#039;t match the captcha', $body);
     }
 
 }

@@ -23,16 +23,33 @@ using Google's reCAPTCHA service
  * Copy the `recaptcha` directory into your main SilverStripe webroot
  * Run ?flush=1
 
-This should go in your `mysite/_config.php`. You can get an free API key at [https://www.google.com/recaptcha](https://www.google.com/recaptcha/admin/create)
+This should go in your `mysite/_config/recaptha.yml`. You can get an free API key at [https://www.google.com/recaptcha](https://www.google.com/recaptcha/admin/create)
 
-	RecaptchaField::$public_api_key = '<publickey>';
-	RecaptchaField::$private_api_key = '<privatekey>';
+```
+RecaptchaField:
+  public_api_key: "your-site-key"
+  private_api_key: "your-secret-key"
+```
 
-	If using on a site requiring a proxy server for outgoing traffic then you can set these additional
-	options in your `mysite/_config.php`. 
+If using on a site requiring a proxy server for outgoing traffic then you can set these additional
+options in your `mysite/_config/recaptcha.yml` by adding. 
+```
+  proxy_server: "proxy_address"
+  proxy_auth: "username:password"
+```
 
-	RecaptchaField::$proxy_server = "<proxy address>";
-	RecaptchaField::$proxy_auth = "<proxy_username>:<proxy_password>";
+To use the noscript fallback method, add the key `noscript_enabled: true` to your yml.
+
+To change the language, add it to an array of options to your yml
+```
+  options: 
+    hl: NL
+    theme: dark
+    type: audio
+    size: compact
+```
+
+See https://developers.google.com/recaptcha/docs/display#render_param for all available parameters
 
 ## Usage
 
