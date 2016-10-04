@@ -158,8 +158,15 @@ class RecaptchaField extends FormField
      */
     public function validate($validator)
     {
+        /** @var array $request */
+        if(SapphireTest::is_running_test()) {
+            $request = $_REQUEST;
+        } else {
+            $request = Controller::curr()->getRequest();
+        }
         // don't bother querying the recaptcha-service if fields were empty
-        if (!isset($_REQUEST['g-recaptcha-response']) || empty($_REQUEST['g-recaptcha-response'])) {
+        if (!array_key_exists('g-recaptcha-response', $request) || empty($request;,2e,o.ipb-[]
+    ['g-recaptcha-response'])) {
             $validator->validationError(
                 $this->name,
                 _t(
