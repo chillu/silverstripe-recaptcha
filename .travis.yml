@@ -4,18 +4,14 @@ language: php
 
 matrix:
   include:
-    - php: 5.3
-      env: DB=MYSQL CORE_RELEASE=3.1
-    - php: 5.4
-      env: DB=MYSQL CORE_RELEASE=3.2
     - php: 5.5
-      env: DB=MYSQL CORE_RELEASE=3.3
+      env: DB=MYSQL CORE_RELEASE=4.0
     - php: 5.6
-      env: DB=MYSQL CORE_RELEASE=3
+      env: DB=MYSQL CORE_RELEASE=4.0
     - php: 5.6
-      env: DB=MYSQL CORE_RELEASE=3.1 SECUREASSETS=1
+      env: DB=MYSQL CORE_RELEASE=4.0 SECUREASSETS=1
     - php: 5.6
-      env: DB=PGSQL CORE_RELEASE=3.3
+      env: DB=PGSQL CORE_RELEASE=4.0
 
 before_script:
  - pear -q install --onlyreqdeps pear/PHP_CodeSniffer
