@@ -14,7 +14,7 @@ using Google's reCAPTCHA service
 
 ## Requirements
 
- * SilverStripe framework 3.1 or newer
+ * SilverStripe framework 4.0 or newer
  * curl PHP module
  * Requires [spamprotection](http://silverstripe.org/spam-protection-module/) module
 
