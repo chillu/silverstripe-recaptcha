@@ -164,8 +164,9 @@ class RecaptchaField extends FormField
         } else {
             $request = Controller::curr()->getRequest();
         }
-        // don't bother querying the recaptcha-service if fields were empty
-        if (!array_key_exists('g-recaptcha-response', $request) || empty($request['g-recaptcha-response'])) {
+
+        // If the field is empty don't bother querying the recaptcha-service
+        if (!isset($request['g-recaptcha-response']) || empty($request['g-recaptcha-response'])) {
             $validator->validationError(
                 $this->name,
                 _t(
