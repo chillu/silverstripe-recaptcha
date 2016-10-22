@@ -162,7 +162,7 @@ class RecaptchaField extends FormField
         if(SapphireTest::is_running_test()) {
             $request = $_REQUEST;
         } else {
-            $request = Controller::curr()->getRequest();
+            $request = Controller::curr()->getRequest()->postVars();
         }
         // don't bother querying the recaptcha-service if fields were empty
         if (!array_key_exists('g-recaptcha-response', $request) || empty($request['g-recaptcha-response'])) {
