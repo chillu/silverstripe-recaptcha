@@ -113,21 +113,27 @@ class RecaptchaField extends FormField
         $previousError = Session::get("FormField.{$this->form->FormName()}.{$this->getName()}.error");
         Session::clear("FormField.{$this->form->FormName()}.{$this->getName()}.error");
 
-        $recaptchaJsUrl = self::config()->get('recaptcha_js_url');
-        // js (main logic)
-        $jsURL = sprintf($recaptchaJsUrl, $publicKey);
-        if (!empty($previousError)) {
-            $jsURL .= "&error={$previousError}";
-        }
-
         // turn options array into data attributes
         $optionString = '';
-        $config = self::config()->get('options') ?: array();
+        $config = array_merge(
+        	self::config()->get('options') ?: array(),
+        	$this->options
+        );        
+
         foreach ($config as $option => $value) {
             $optionString .= ' data-' . htmlentities($option) . '="' . htmlentities($value) . '"';
         }
 
+        $jsURL = self::config()->get('recaptcha_js_url');
+        if(isset($config['hl'])) {
+        	$jsURL = HTTP::setGetVar('hl', $config['hl'], $jsURL);
+        }
+        if (!empty($previousError)) {
+            $jsURL = HTTP::setGetVar('error', $previousError, $jsURL);
+        }
+
         Requirements::javascript($jsURL);
+
         $fieldData = ArrayData::create(
             array(
                 'public_api_key' => self::config()->get('public_api_key'),
