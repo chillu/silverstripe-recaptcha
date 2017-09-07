@@ -1,5 +1,5 @@
 fi:
-  RecaptchaField:
+  SilverStripe\Recaptcha\RecaptchaField:
     EMPTY: Captcha-kenttä tulee täyttää
     VALIDSOLUTION: Vastauksesi ei ollut sama kuin captcha-kentässä olleet sanat. Yritä uudelleen.
     NORESPONSE: Tekninen virhe: Recaptcha-palvelu ei vastaa. Yritä myöhemmin uudelleen.
