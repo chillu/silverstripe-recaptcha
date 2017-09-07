@@ -13,8 +13,17 @@
     }
   ],
   "require": {
-    "silverstripe/spamprotection": "*",
-    "silverstripe/framework": "~4.0"
+    "silverstripe/spamprotection": "dev-master",
+    "silverstripe/framework": "^4.0@dev"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "SilverLeague\\Recaptcha\\": "code/",
+      "SilverLeague\\Recaptcha\\Tests\\": "tests/"
+    }
   },
   "extra": {
     "branch-alias": {
