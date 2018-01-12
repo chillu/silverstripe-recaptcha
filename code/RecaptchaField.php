@@ -288,10 +288,12 @@ class RecaptchaField_HTTPClient extends Object
     public function post($url, $postVars)
     {
         $ch = curl_init($url);
-        if (!empty(RecaptchaField::$proxy_server)) {
-            curl_setopt($ch, CURLOPT_PROXY, RecaptchaField::$proxy_server);
-            if (!empty(RecaptchaField::$proxy_auth)) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, RecaptchaField::$proxy_auth);
+        $proxyServer = Config::inst()->get('RecaptchaField', 'proxy_server');
+        if (!empty($proxyServer)) {
+            curl_setopt($ch, CURLOPT_PROXY, $proxyServer);
+            $proxyAuth = Config::inst()->get('RecaptchaField', 'proxy_auth');
+            if (!empty($proxyAuth)) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyAuth);
             }
         }
 
