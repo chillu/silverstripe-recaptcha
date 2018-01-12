@@ -1,3 +1,5 @@
+sudo: false
+
 language: php
 
 env:
@@ -20,5 +22,5 @@ before_script:
  - if [[ $DB == PGSQL ]]; then composer require --prefer-dist --no-update silverstripe/postgresql:2.0.x-dev; fi
  - composer update
 
-script: 
+script:
  - vendor/bin/phpunit tests/
