@@ -26,7 +26,7 @@ using Google's reCAPTCHA service
 This should go in your `mysite/_config/recaptha.yml`. You can get an free API key at [https://www.google.com/recaptcha](https://www.google.com/recaptcha/admin/create)
 
 ```
-RecaptchaField:
+SilverStripe\Recaptcha\RecaptchaField:
   public_api_key: "your-site-key"
   private_api_key: "your-secret-key"
 ```
@@ -71,8 +71,8 @@ Configuration example in `mysite/_config/spamprotection.yml`
 	---
 	name: spamprotection
 	---
-	FormSpamProtectionExtension:
-	  default_spam_protector: RecaptchaProtector
+	SilverStripe\SpamProtection\Extension\FormSpamProtectionExtension:
+	  default_spam_protector: SilverStripe\Recaptcha\RecaptchaProtector
   
 
 Then once you have setup this config you will need to include the spam protector field as per the instructions on the [spamprotection](https://github.com/silverstripe/silverstripe-spamprotection) page.

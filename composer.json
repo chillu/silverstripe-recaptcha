@@ -1,7 +1,7 @@
 {
   "name": "silverstripe/recaptcha",
   "description": "Provides a form field which allows form to validate for non-bot submissions by giving them a challenge to decrypt an image.",
-  "type": "silverstripe-module",
+  "type": "silverstripe-vendormodule",
   "keywords": [
     "silverstripe",
     "spamprotection"
@@ -13,8 +13,17 @@
     }
   ],
   "require": {
-    "silverstripe/spamprotection": "*",
-    "silverstripe/framework": "~4.0"
+    "silverstripe/spamprotection": "dev-master",
+    "silverstripe/framework": "^4.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "SilverLeague\\Recaptcha\\": "code/",
+      "SilverLeague\\Recaptcha\\Tests\\": "tests/"
+    }
   },
   "extra": {
     "branch-alias": {

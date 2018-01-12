@@ -1,7 +1,13 @@
 <?php
-/**
- * @package recaptcha
- */
+
+namespace SilverStripe\Recaptcha;
+
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Forms\FormField;
+use SilverStripe\Forms\Validator;
+use SilverStripe\View\ArrayData;
+use SilverStripe\View\Requirements;
 
 /**
  * Provides an {@link FormField} which allows form to validate for non-bot submissions
@@ -12,6 +18,8 @@
  *
  * @see https://www.google.com/recaptcha/
  * @see https://www.google.com/recaptcha/admin
+ *
+ * @package recaptcha
  */
 class RecaptchaField extends FormField
 {
@@ -29,7 +37,7 @@ class RecaptchaField extends FormField
     public $options = array();
 
     /**
-     * @var RecaptchaField_HTTPClient
+     * @var RecaptchaFieldHttpClient
      */
     public $client;
 
@@ -90,7 +98,7 @@ class RecaptchaField extends FormField
     /**
      * @var string
      */
-    private static $httpclient_class = 'RecaptchaField_HTTPClient';
+    private static $httpclient_class = RecaptchaFieldHttpClient::class;
 
     public function __construct($name, $title = null, $value = null)
     {
@@ -104,14 +112,16 @@ class RecaptchaField extends FormField
 
     public function Field($properties = array())
     {
+        $request = Controller::curr()->getRequest();
+
         $privateKey = self::config()->get('private_api_key');
         $publicKey = self::config()->get('public_api_key');
         if (empty($publicKey) || empty($privateKey)) {
-            user_error('RecaptchaField::FieldHolder() Please specify valid Recaptcha Keys', E_USER_ERROR);
+            user_error('SilverStripe\Recaptcha\RecaptchaField::FieldHolder() Please specify valid Recaptcha Keys', E_USER_ERROR);
         }
 
-        $previousError = Session::get("FormField.{$this->form->FormName()}.{$this->getName()}.error");
-        Session::clear("FormField.{$this->form->FormName()}.{$this->getName()}.error");
+        $previousError = $request->getSession()->get("FormField.{$this->form->FormName()}.{$this->getName()}.error");
+        $request->getSession()->clear("FormField.{$this->form->FormName()}.{$this->getName()}.error");
 
         $recaptchaJsUrl = self::config()->get('recaptcha_js_url');
         // js (main logic)
@@ -135,7 +145,7 @@ class RecaptchaField extends FormField
                 'options'        => $optionString
             )
         );
-        $html = $fieldData->renderWith('recaptcha');
+        $html = $fieldData->renderWith('SilverStripe\Recaptcha\Recaptcha');
         if (self::config()->get('noscript_enabled')) {
             // noscript fallback
             $noscriptData = ArrayData::create(
@@ -143,7 +153,7 @@ class RecaptchaField extends FormField
                     'public_api_key' => self::config()->get('public_api_key')
                 )
             );
-            $resultHTML = $noscriptData->renderWith('recaptcha_noscript');
+            $resultHTML = $noscriptData->renderWith('SilverStripe\Recaptcha\Recaptcha_NoScript');
             $html .= $resultHTML;
         }
         return $html;
@@ -158,18 +168,16 @@ class RecaptchaField extends FormField
      */
     public function validate($validator)
     {
-        /** @var array $request */
-        if(SapphireTest::is_running_test()) {
-            $request = $_REQUEST;
-        } else {
-            $request = Controller::curr()->getRequest();
-        }
+        /** @var HTTPRequest $request */
+        $request = Controller::curr()->getRequest();
+        $data = $request->postVars();
+
         // don't bother querying the recaptcha-service if fields were empty
-        if (!array_key_exists('g-recaptcha-response', $request) || empty($request['g-recaptcha-response'])) {
+        if (!array_key_exists('g-recaptcha-response', $data) || empty($data['g-recaptcha-response'])) {
             $validator->validationError(
                 $this->name,
                 _t(
-                    'RecaptchaField.EMPTY',
+                    'SilverStripe\Recaptcha\RecaptchaField.EMPTY',
                     "Please answer the captcha question",
                     "Recaptcha (https://www.google.com/recaptcha) protects this website "
                     . "from spam and abuse."
@@ -181,13 +189,13 @@ class RecaptchaField extends FormField
             return false;
         }
 
-        $response = $this->recaptchaHTTPPost($_REQUEST['g-recaptcha-response']);
+        $response = $this->recaptchaHttpPost($data['g-recaptcha-response']);
 
         if (!$response) {
             $validator->validationError(
                 $this->name,
                 _t(
-                    'RecaptchaField.NORESPONSE',
+                    'SilverStripe\Recaptcha\RecaptchaField.NORESPONSE',
                     'The recaptcha service gave no response. Please try again later.',
                     'Recaptcha (https://www.google.com/recaptcha) protects this website '
                     . 'from spam and abuse.'
@@ -206,16 +214,16 @@ class RecaptchaField extends FormField
             $userLevelErrors = array('missing-input-response', 'invalid-input-response');
             $error = implode(', ', $response['error-codes']);
             if (count(array_intersect($response['error-codes'], $userLevelErrors)) === 0) {
-                user_error("RecatpchaField::validate(): Recaptcha-service error: '{$error}'", E_USER_ERROR);
+                user_error("SilverStripe\Recaptcha\RecatpchaField::validate(): Recaptcha-service error: '{$error}'", E_USER_ERROR);
                 return false;
             } else {
                 // Internal error-string returned by recaptcha, e.g. "incorrect-captcha-sol".
                 // Used to generate the new iframe-url/js-url after form-refresh.
-                Session::set("FormField.{$this->form->FormName()}.{$this->getName()}.error", trim($error));
+                $request->getSession()->set("FormField.{$this->form->FormName()}.{$this->getName()}.error", trim($error));
                 $validator->validationError(
                     $this->name,
                     _t(
-                        'RecaptchaField.VALIDSOLUTION',
+                        'SilverStripe\Recaptcha\RecaptchaField.VALIDSOLUTION',
                         "Your answer didn't match",
                         'Recaptcha (https://www.google.com/recaptcha) protects this website '
                         . 'from spam and abuse.'
@@ -237,14 +245,14 @@ class RecaptchaField extends FormField
      * @param string $responseStr
      * @return string Raw HTTP-response
      */
-    protected function recaptchaHTTPPost($responseStr)
+    protected function recaptchaHttpPost($responseStr)
     {
         $postVars = array(
             'secret'   => self::config()->get('private_api_key'),
             'remoteip' => $_SERVER['REMOTE_ADDR'],
             'response' => $responseStr,
         );
-        $client = $this->getHTTPClient();
+        $client = $this->getHttpClient();
         $response = $client->post(self::config()->get('api_verify_server'), $postVars);
 
         return $response->getBody();
@@ -254,16 +262,16 @@ class RecaptchaField extends FormField
      * @param RecaptchaField_HTTPClient
      * @return $this
      */
-    public function setHTTPClient($client)
+    public function setHttpClient($client)
     {
         $this->client = $client;
         return $this;
     }
 
     /**
-     * @return RecaptchaField_HTTPClient
+     * @return RecaptchaFieldHttpClient
      */
-    public function getHTTPClient()
+    public function getHttpClient()
     {
         if (!$this->client) {
             $class = self::config()->get('httpclient_class');
@@ -271,45 +279,5 @@ class RecaptchaField extends FormField
         }
 
         return $this->client;
-    }
-}
-
-/**
- * Simple HTTP client, mainly to make it mockable.
- */
-class RecaptchaField_HTTPClient extends Object
-{
-
-    /**
-     * @param String $url
-     * @param $postVars
-     * @return String HTTPResponse
-     */
-    public function post($url, $postVars)
-    {
-        $ch = curl_init($url);
-        if (!empty(RecaptchaField::$proxy_server)) {
-            curl_setopt($ch, CURLOPT_PROXY, RecaptchaField::$proxy_server);
-            if (!empty(RecaptchaField::$proxy_auth)) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, RecaptchaField::$proxy_auth);
-            }
-        }
-
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'reCAPTCHA/PHP');
-        // we need application/x-www-form-urlencoded
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postVars));
-        $response = curl_exec($ch);
-
-        if (class_exists('SS_HTTPResponse')) {
-            $responseObj = new SS_HTTPResponse();
-        } else {
-            // 2.3 backwards compat
-            $responseObj = new HttpResponse();
-        }
-        $responseObj->setBody($response); // 2.2. compat
-        $responseObj->addHeader('Content-Type', 'application/json');
-        return $responseObj;
     }
 }

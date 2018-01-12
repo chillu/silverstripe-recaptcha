@@ -1,16 +1,24 @@
 <?php
-/**
- * @package recaptcha
- */
+
+namespace SilverStripe\Recaptcha;
+
+use SilverStripe\Control\Director;
+use SilverStripe\SpamProtection\SpamProtector;
 
 /**
  * Protecter class to handle spam protection interface
+ *
+ * @package recaptcha
  */
 class RecaptchaProtector implements SpamProtector
 {
 
     /**
      * Return the Field that we will use in this protector
+     *
+     * @param string $name
+     * @param string $title
+     * @param null   $value
      *
      * @return string
      */
