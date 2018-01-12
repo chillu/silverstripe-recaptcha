@@ -5,16 +5,14 @@
 ## Introduction
 
 Provides a FormField which allows form to validate for non-bot submissions
-using Google's reCAPTCHA service
+using Google's [reCAPTCHA v2](https://developers.google.com/recaptcha/docs/display) service.
 
-## Maintainer Contact
-
- * Ingo Schommer (Nickname: ischommer, chillu)
-   <ingo (at) silverstripe (dot) com>
+In order to use Google's new [Invisible reCAPTCHA](https://developers.google.com/recaptcha/docs/invisible) service,
+please use the [undefinedoffset/silverstripe-nocaptcha](https://github.com/UndefinedOffset/silverstripe-nocaptcha) module.
 
 ## Requirements
 
- * SilverStripe framework 4.0 or newer
+ * SilverStripe Framework 4.0 or newer
  * curl PHP module
  * Requires [spamprotection](http://silverstripe.org/spam-protection-module/) module
 
@@ -23,7 +21,7 @@ using Google's reCAPTCHA service
  * Copy the `recaptcha` directory into your main SilverStripe webroot
  * Run ?flush=1
 
-This should go in your `mysite/_config/recaptha.yml`. You can get an free API key at [https://www.google.com/recaptcha](https://www.google.com/recaptcha/admin/create)
+This should go in your `mysite/_config/recaptcha.yml`. You can get an free API key at [https://www.google.com/recaptcha](https://www.google.com/recaptcha/admin/create)
 
 ```
 SilverStripe\Recaptcha\RecaptchaField:
