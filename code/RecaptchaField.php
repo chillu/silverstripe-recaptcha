@@ -189,7 +189,7 @@ class RecaptchaField extends FormField
             return false;
         }
 
-        $response = $this->recaptchaHttpPost($_REQUEST['g-recaptcha-response']);
+        $response = $this->recaptchaHttpPost($data['g-recaptcha-response']);
 
         if (!$response) {
             $validator->validationError(

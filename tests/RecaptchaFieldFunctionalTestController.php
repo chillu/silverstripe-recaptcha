@@ -23,6 +23,8 @@ class RecaptchaFieldFunctionalTestController extends Controller implements TestO
 
     protected $template = 'BlankPage';
 
+    private static $url_segment = 'RecaptchaFieldFunctionalTest_Controller';
+
     public function Link($action = null)
     {
         return Controller::join_links('RecaptchaFieldFunctionalTest_Controller', $action);
