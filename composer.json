@@ -13,7 +13,7 @@
     }
   ],
   "require": {
-    "silverstripe/spamprotection": "dev-master",
+    "silverstripe/spamprotection": "~3.0",
     "silverstripe/framework": "^4.0"
   },
   "require-dev": {
