@@ -17,10 +17,9 @@ matrix:
 
 before_script:
  - phpenv rehash
-
- - composer install --prefer-dist
+ - composer validate
  - if [[ $DB == PGSQL ]]; then composer require --prefer-dist --no-update silverstripe/postgresql:2.0.x-dev; fi
- - composer update
+ - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
 script:
  - vendor/bin/phpunit tests/
