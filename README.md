@@ -7,9 +7,6 @@
 Provides a FormField which allows form to validate for non-bot submissions
 using Google's [reCAPTCHA v2](https://developers.google.com/recaptcha/docs/display) service.
 
-In order to use Google's new [Invisible reCAPTCHA](https://developers.google.com/recaptcha/docs/invisible) service,
-please use the [undefinedoffset/silverstripe-nocaptcha](https://github.com/UndefinedOffset/silverstripe-nocaptcha) module.
-
 ## Requirements
 
  * SilverStripe Framework 4.0 or newer
