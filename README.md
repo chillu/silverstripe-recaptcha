@@ -8,7 +8,7 @@ Provides a FormField which allows form to validate for non-bot submissions
 using Google's [reCAPTCHA v2](https://developers.google.com/recaptcha/docs/display) service.
 
 In order to use Google's new [Invisible reCAPTCHA](https://developers.google.com/recaptcha/docs/invisible) service,
-please use the [undefinedoffset/silverstripe-nocaptcha](https://github.com/UndefinedOffset/silverstripe-nocaptcha) module.
+please use the [undefinedoffset/silverstripe-nocaptcha](https://github.com/UndefinedOffset/silverstripe-nocaptcha) module. This module is not intended to be used with [reCAPTCHA v3](https://developers.google.com/recaptcha/docs/v3) (see [rationale](https://github.com/chillu/silverstripe-recaptcha/issues/55))
 
 ## Requirements
 
