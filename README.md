@@ -2,6 +2,8 @@
 
 [![Build Status](https://secure.travis-ci.org/chillu/silverstripe-recaptcha.png)](http://travis-ci.org/chillu/silverstripe-recaptcha)
 
+*This module is no longer supported. Please use [UndefinedOffset/silverstripe-nocaptcha](https://github.com/UndefinedOffset/silverstripe-nocaptcha) instead*
+
 ## Introduction
 
 Provides a FormField which allows form to validate for non-bot submissions
