@@ -8,11 +8,9 @@ env:
 
 matrix:
   include:
-    - php: 5.6
-      env: DB=MYSQL
-    - php: 7.0
+    - php: 7.2
       env: DB=PGSQL
-    - php: 7.1
+    - php: 7.3
       env: DB=MYSQL
 
 before_script:
