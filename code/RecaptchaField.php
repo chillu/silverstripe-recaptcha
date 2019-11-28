@@ -277,7 +277,7 @@ class RecaptchaField extends FormField
 /**
  * Simple HTTP client, mainly to make it mockable.
  */
-class RecaptchaField_HTTPClient extends Object
+class RecaptchaField_HTTPClient extends SS_Object
 {
 
     /**
