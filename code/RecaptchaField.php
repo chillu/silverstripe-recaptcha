@@ -128,14 +128,13 @@ class RecaptchaField extends FormField
         }
 
         Requirements::javascript($jsURL);
-        $fieldData = ArrayData::create(
-            array(
+        $html = $this
+            ->customise(array(
                 'public_api_key' => self::config()->get('public_api_key'),
                 'name'           => $this->getName(),
                 'options'        => $optionString
-            )
-        );
-        $html = $fieldData->renderWith('recaptcha');
+            ))
+            ->renderWith('recaptcha');
         if (self::config()->get('noscript_enabled')) {
             // noscript fallback
             $noscriptData = ArrayData::create(
